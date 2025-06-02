@@ -1,4 +1,7 @@
 package com.dailycodework.universalpetcare.repository;
 
-public interface VeterinarianRepository {
+import com.dailycodework.universalpetcare.model.Veterinarian;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface VeterinarianRepository extends JpaRepository<Veterinarian, Long> {
 }
