@@ -7,6 +7,7 @@ import com.dailycodework.universalpetcare.model.User;
 import com.dailycodework.universalpetcare.repository.AppointmentRepository;
 import com.dailycodework.universalpetcare.repository.UserRepository;
 import com.dailycodework.universalpetcare.request.AppointmentUpdateRequest;
+import com.dailycodework.universalpetcare.utils.FeedBackMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +34,7 @@ public class AppointmentService implements IAppointmentService{
             appointment.setStatus(AppointmentStatus.WAITING_FOR_APPROVAL);
             return appointmentRepository.save(appointment);
         }
-        throw new ResourceNotFoundException("No such Appointment - sender or recipient not found");
+        throw new ResourceNotFoundException(FeedBackMessage.SENDER_RECIPIENT_NOT_FOUND);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class AppointmentService implements IAppointmentService{
     public Appointment updateAppointment(Long id, AppointmentUpdateRequest appointmentUpdateRequestRequest) {
         Appointment existingAppointment = getAppointmentById(id);
         if(!Objects.equals(existingAppointment.getStatus(), AppointmentStatus.WAITING_FOR_APPROVAL)){
-            throw new IllegalStateException("Sorry. This appointment can no longer be updated");
+            throw new IllegalStateException(FeedBackMessage.ALREADY_APPROVED);
         }else{
             existingAppointment.setAppointmentDate(appointmentUpdateRequestRequest.getAppointmentDate());
             existingAppointment.setAppointmentTime(appointmentUpdateRequestRequest.getAppointmentTime());
@@ -55,32 +56,32 @@ public class AppointmentService implements IAppointmentService{
     }
 
     @Override
-    public void deleteAppointment(Long id) {
-        appointmentRepository.findById(id).ifPresentOrElse(appointmentRepository::delete, ()->{throw new ResourceNotFoundException("appointment not found");});
+    public void deleteAppointmentById(Long id) {
+        appointmentRepository.findById(id).ifPresentOrElse(appointmentRepository::delete, ()->{throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);});
     }
 
     @Override
     public Appointment getAppointmentById(Long id) {
-        return appointmentRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("appointment not found"));
+        return appointmentRepository.findById(id).orElseThrow(()->new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
     }
 
     @Override
     public Appointment getAppointmentByNo(String appointmentNo) {
         return appointmentRepository.findByAppointmentNo(appointmentNo);
     }
-
-    @Override
-    public Appointment getAppointmentByDate(Date appointmentDate) {
-        return appointmentRepository.findByAppointmentDate(appointmentDate);
-    }
-
-    @Override
-    public Appointment getAppointmentByTime(Time appointmentTime) {
-        return appointmentRepository.findAppointmentByTime(appointmentTime);
-    }
-
-    @Override
-    public Appointment getAppointmentByAllSpecs(Long id, String appointmentNo, Date appointmentDate, Time appointmentTime) {
-        return appointmentRepository.findAppointmentByAllSpecs(id, appointmentNo, appointmentDate, appointmentTime);
-    }
+//
+//    @Override
+//    public Appointment getAppointmentByDate(Date appointmentDate) {
+//        return appointmentRepository.findByAppointmentDate(appointmentDate);
+//    }
+//
+//    @Override
+//    public Appointment getAppointmentByTime(Time appointmentTime) {
+//        return appointmentRepository.findAppointmentByTime(appointmentTime);
+//    }
+//
+//    @Override
+//    public Appointment getAppointmentByAllSpecs(Long id, String appointmentNo, Date appointmentDate, Time appointmentTime) {
+//        return appointmentRepository.findAppointmentByAllSpecs(id, appointmentNo, appointmentDate, appointmentTime);
+//    }
 }

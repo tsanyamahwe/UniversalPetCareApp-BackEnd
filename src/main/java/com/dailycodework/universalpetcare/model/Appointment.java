@@ -1,11 +1,14 @@
 package com.dailycodework.universalpetcare.model;
 
 import com.dailycodework.universalpetcare.enums.AppointmentStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -17,14 +20,18 @@ import java.util.Random;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"patient", "veterinarian"})
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String reason;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate appointmentDate;
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime appointmentTime;
     private String appointmentNo;
+    @CreationTimestamp
     private LocalDate createdAt;
     @JoinColumn(name = "sender")
     @ManyToOne(fetch = FetchType.LAZY)

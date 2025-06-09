@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -29,6 +31,8 @@ public class User {
     private String password;
     private String userType;
     private boolean isEnabled;
+    @CreationTimestamp
+    private LocalDate createdAt;
     @Transient
     private String specialization;
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

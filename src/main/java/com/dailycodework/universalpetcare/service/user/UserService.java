@@ -9,6 +9,7 @@ import com.dailycodework.universalpetcare.repository.UserRepository;
 import com.dailycodework.universalpetcare.repository.VeterinarianRepository;
 import com.dailycodework.universalpetcare.request.RegistrationRequest;
 import com.dailycodework.universalpetcare.request.UserUpdateRequest;
+import com.dailycodework.universalpetcare.utils.FeedBackMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -41,12 +42,12 @@ public class UserService implements IUserService{
 
     @Override
     public User findById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User not found!"));
+        return userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
     }
 
     @Override
     public void delete(Long userId){
-        userRepository.findById(userId).ifPresentOrElse(userRepository::delete, ()->{throw new ResourceNotFoundException("User not found");});
+        userRepository.findById(userId).ifPresentOrElse(userRepository::delete, ()->{throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);});
     }
 
     @Override

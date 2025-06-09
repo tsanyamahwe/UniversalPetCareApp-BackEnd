@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     Appointment findByAppointmentNo(String appointmentNo);
-    Appointment findByAppointmentDate(Date date);
-    Appointment findAppointmentByTime(Time time);
-    Appointment findAppointmentByAllSpecs(Long id, String appointmentNo, Date date, Time time);
+//    Appointment findByAppointmentDate(Date date);
+//    Appointment findAppointmentByTime(Time time);
+//    Appointment findAppointmentByAllSpecs(Long id, String appointmentNo, Date date, Time time);
 }
