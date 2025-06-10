@@ -3,16 +3,19 @@ package com.dailycodework.universalpetcare.service.appointment;
 import com.dailycodework.universalpetcare.enums.AppointmentStatus;
 import com.dailycodework.universalpetcare.exception.ResourceNotFoundException;
 import com.dailycodework.universalpetcare.model.Appointment;
+import com.dailycodework.universalpetcare.model.Pet;
 import com.dailycodework.universalpetcare.model.User;
 import com.dailycodework.universalpetcare.repository.AppointmentRepository;
+import com.dailycodework.universalpetcare.repository.PetRepository;
 import com.dailycodework.universalpetcare.repository.UserRepository;
 import com.dailycodework.universalpetcare.request.AppointmentUpdateRequest;
+import com.dailycodework.universalpetcare.request.BookAppointmentRequest;
+import com.dailycodework.universalpetcare.service.pet.IPetService;
 import com.dailycodework.universalpetcare.utils.FeedBackMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Time;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,12 +25,19 @@ import java.util.Optional;
 public class AppointmentService implements IAppointmentService{
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
+    private final IPetService petService;
 
+    @Transactional
     @Override
-    public Appointment createAppointment(Appointment appointment, Long senderId, Long recipientId) {
+    public Appointment createAppointment(BookAppointmentRequest bookAppointmentRequest, Long senderId, Long recipientId) {
         Optional<User> sender = userRepository.findById(senderId);
         Optional<User> recipient = userRepository.findById(recipientId);
         if(sender.isPresent() && recipient.isPresent()){
+            Appointment appointment = bookAppointmentRequest.getAppointment();
+            List<Pet> pets = bookAppointmentRequest.getPet();
+            pets.forEach(pet -> pet.setAppointment(appointment));
+            List<Pet> savedPet = petService.savePetForAppointment(pets);
+            appointment.setPets(savedPet);
             appointment.addPatient(sender.get());
             appointment.addVeterinarian(recipient.get());
             appointment.setAppointmentNo();

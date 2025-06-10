@@ -3,12 +3,12 @@ package com.dailycodework.universalpetcare.controller;
 import com.dailycodework.universalpetcare.exception.ResourceNotFoundException;
 import com.dailycodework.universalpetcare.model.Appointment;
 import com.dailycodework.universalpetcare.request.AppointmentUpdateRequest;
+import com.dailycodework.universalpetcare.request.BookAppointmentRequest;
 import com.dailycodework.universalpetcare.response.APIResponse;
 import com.dailycodework.universalpetcare.service.appointment.AppointmentService;
 import com.dailycodework.universalpetcare.utils.FeedBackMessage;
 import com.dailycodework.universalpetcare.utils.UrlMapping;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,17 +26,17 @@ public class AppointmentController {
     public ResponseEntity<APIResponse> getAllAppointments(){
         try{
             List<Appointment> appointments = appointmentService.getAllAppointments();
-            return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.FOUND, appointments));
+            return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.RESOURCE_FOUND, appointments));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
         }
     }
 
     @PostMapping(UrlMapping.BOOK_APPOINTMENT)
-    public ResponseEntity<APIResponse> bookAppointment(@RequestBody Appointment appointment, @RequestParam Long senderId, @RequestParam Long recipientId){
+    public ResponseEntity<APIResponse> bookAppointment(@RequestBody BookAppointmentRequest bookAppointmentRequest, @RequestParam Long senderId, @RequestParam Long recipientId){
         try{
-            Appointment theAppointment = appointmentService.createAppointment(appointment, senderId, recipientId);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, theAppointment));
+            Appointment theAppointment = appointmentService.createAppointment(bookAppointmentRequest, senderId, recipientId);
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, theAppointment));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         } catch (Exception e) {
@@ -48,7 +48,7 @@ public class AppointmentController {
     public ResponseEntity<APIResponse> getAppointmentById(@PathVariable Long id){
         try {
             Appointment appointment = appointmentService.getAppointmentById(id);
-            return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.FOUND, appointment));
+            return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.RESOURCE_FOUND, appointment));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }catch (Exception e) {
@@ -60,7 +60,7 @@ public class AppointmentController {
     public ResponseEntity<APIResponse> getAppointmentByNo(@PathVariable String appointmentNo){
         try {
             Appointment appointment = appointmentService.getAppointmentByNo(appointmentNo);
-            return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.FOUND, appointment));
+            return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.RESOURCE_FOUND, appointment));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }catch (Exception e) {

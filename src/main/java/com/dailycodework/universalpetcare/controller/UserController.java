@@ -31,7 +31,7 @@ public class UserController {
         try{
             User theUser = userService.register(registrationRequest);
             UserDTO registeredUser = entityConverter.mapEntityToDTO(theUser, UserDTO.class);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, registeredUser));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, registeredUser));
         }catch (UserAlreadyExistException e){
             return ResponseEntity.status(CONFLICT).body(new APIResponse(e.getMessage(), null));
         } catch (Exception e) {
@@ -57,7 +57,7 @@ public class UserController {
         try{
             User theUser = userService.findById(userId);
             UserDTO deletedUser = entityConverter.mapEntityToDTO(theUser, UserDTO.class);
-            return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.FOUND, deletedUser));
+            return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.RESOURCE_FOUND, deletedUser));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }catch (Exception e) {
@@ -80,6 +80,6 @@ public class UserController {
     @GetMapping(UrlMapping.GET_ALL_USERS)
     public ResponseEntity<APIResponse> getAllUsers(){
         List<UserDTO> theUsers = userService.getAllUsers();
-        return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.FOUND, theUsers));
+        return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.RESOURCE_FOUND, theUsers));
     }
 }
