@@ -10,7 +10,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 @Getter
 @Setter
@@ -41,6 +40,8 @@ public class User {
     private List<Appointment> veterinarianAppointments;
     @Transient
     private List<Appointment> appointments;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private Photo photo;
 
     public List<Appointment> getAppointments() {
         if(appointments == null){

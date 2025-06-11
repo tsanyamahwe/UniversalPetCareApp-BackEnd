@@ -19,13 +19,21 @@ public class UrlMapping {
     public static final String GET_APPOINTMENT_BY_NO = "/appointment/{appointmentNo}/appointment";
     public static final String DELETE_APPOINTMENT = "/appointment/{id}/delete";
     public static final String UPDATE_APPOINTMENT = "/appointment/{id}/update";
-    /*============= End Appointment API ===============*/
+    /*================ End Appointment API ===============*/
 
-    /*============= Start Pet API =====================*/
+    /*================ Start Pet API =====================*/
     public static final String PETS = API+"/pets";
     public static final String SAVE_PETS_FOR_APPOINTMENTS = "/save-pets";
     public static final String GET_PET_BY_ID = "/pet/{id}";
     public static final String DELETE_PET_BY_ID = "/pet/{id}/delete";
     public static final String PET_UPDATE = "/pet/{id}/update";
-    /*============= End Pet API =======================*/
+    /*=============== End Pet API =======================*/
+
+    /*================== Start Photo API ================*/
+    public static final String PHOTOS = API+"/photos";
+    public static final String UPLOAD_PHOTO = "/photo/upload";
+    public static final String UPDATE_PHOTO = "/photo/{photoId}/update";
+    public static final String DELETE_PHOTO = "/photo/{photoId}/delete";
+    public static final String GET_PHOTO_BY_ID = "/photo/{photoId}";
+    /*================= End Photo API =====================*/
 }
