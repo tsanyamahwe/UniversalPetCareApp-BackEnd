@@ -9,4 +9,5 @@ public class FeedBackMessage {
     public static final String ALREADY_APPROVED = "Sorry. This appointment can no longer be updated, it is already approved";
     public static final String NOT_FOUND = "Resource not found";
     public static final String SERVER_ERROR = "Server error";
+    public static final String NO_FILE_PROVIDED = "No file provided for update";
 }

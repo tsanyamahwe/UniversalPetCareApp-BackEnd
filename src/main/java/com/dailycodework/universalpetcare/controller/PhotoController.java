@@ -38,6 +38,9 @@ public class PhotoController {
     @PutMapping(UrlMapping.UPDATE_PHOTO)
     public ResponseEntity<APIResponse> updatePhoto(@PathVariable Long photoId, @RequestParam(value = "file", required = false) MultipartFile file) throws SQLException {
         try {
+            if(file == null || file.isEmpty()){
+                return ResponseEntity.badRequest().body(new APIResponse(FeedBackMessage.NO_FILE_PROVIDED, null));
+            }
             Photo photo = photoService.getPhotoById(photoId);
             if(photo != null) {
                 Photo updatedPhoto = photoService.updatePhoto(photo.getId(), file);

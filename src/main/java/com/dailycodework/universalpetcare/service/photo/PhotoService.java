@@ -55,9 +55,11 @@ public class PhotoService implements IPhotoService{
         if(photo != null){
             byte[] photoBytes = file.getBytes();
             Blob photoBlob = new SerialBlob(photoBytes);
-            photo.setImage(photoBlob);
-            photo.setFileType(file.getContentType());
-            photo.setFileName(file.getOriginalFilename());
+            if(!file.isEmpty()) {
+                photo.setImage(photoBlob);
+                photo.setFileType(file.getContentType());
+                photo.setFileName(file.getOriginalFilename());
+            }
             return photoRepository.save(photo);
         }else {
             throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);
