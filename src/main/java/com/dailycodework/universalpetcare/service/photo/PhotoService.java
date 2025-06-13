@@ -8,6 +8,7 @@ import com.dailycodework.universalpetcare.repository.UserRepository;
 import com.dailycodework.universalpetcare.utils.FeedBackMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.rowset.serial.SerialBlob;
@@ -24,7 +25,7 @@ public class PhotoService implements IPhotoService{
 
     @Override
     public Photo savePhoto(MultipartFile file, Long userId) throws IOException, SQLException {
-        Optional<User> theUser = userRepository.findById(userId);
+        User theUser = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND+ userId));
         Photo photo = new Photo();
         if(file != null && !file.isEmpty()){
             byte[] photoBytes = file.getBytes();
@@ -34,32 +35,32 @@ public class PhotoService implements IPhotoService{
             photo.setFileName(file.getOriginalFilename());
         }
         Photo savedPhoto = photoRepository.save(photo);
-        theUser.ifPresent(user -> {user.setPhoto(savedPhoto);});
-        userRepository.save(theUser.get());
+        theUser.setPhoto(savedPhoto);
+        userRepository.save(theUser);
         return savedPhoto;
     }
 
     @Override
     public Photo getPhotoById(Long id) {
-        return photoRepository.findById(id).orElse(null);
+        return photoRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
     }
 
+    @Transactional
     @Override
-    public void deletePhoto(Long id) {
+    public void deletePhoto(Long id, Long userId) {
+        userRepository.findById(userId).ifPresentOrElse(User:: removeUserPhoto, ()->{throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);});
         photoRepository.findById(id).ifPresentOrElse(photoRepository::delete, () -> {throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);});
     }
 
     @Override
     public Photo updatePhoto(Long id, MultipartFile file) throws SQLException, IOException {
         Photo photo = getPhotoById(id);
-        if(photo != null){
+        if(file != null && !file.isEmpty()){
             byte[] photoBytes = file.getBytes();
             Blob photoBlob = new SerialBlob(photoBytes);
-            if(!file.isEmpty()) {
-                photo.setImage(photoBlob);
-                photo.setFileType(file.getContentType());
-                photo.setFileName(file.getOriginalFilename());
-            }
+            photo.setImage(photoBlob);
+            photo.setFileType(file.getContentType());
+            photo.setFileName(file.getOriginalFilename());
             return photoRepository.save(photo);
         }else {
             throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);

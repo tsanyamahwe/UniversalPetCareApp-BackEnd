@@ -1,26 +1,26 @@
 package com.dailycodework.universalpetcare.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Blob;
-
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Photo {
+public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String fileType;
-    private String fileName;
-    @JsonIgnore
-    @Lob
-    private Blob image;
+    private String feedback;
+    private int stars;
+    @ManyToOne
+    @JoinColumn(name = "veterinarian_id")
+    private User veterinarian;
+    @ManyToOne
+    @JoinColumn(name = "reviewer_id")
+    private User patient;
 }

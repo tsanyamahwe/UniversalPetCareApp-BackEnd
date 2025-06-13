@@ -34,14 +34,22 @@ public class User {
     private LocalDate createdAt;
     @Transient
     private String specialization;
+    @Transient
+    private List<Review> reviews = new ArrayList<>();
+    @Transient
+    private List<Appointment> appointments = new ArrayList<>();
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Appointment> patientAppointments;
     @OneToMany(mappedBy = "veterinarian", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Appointment> veterinarianAppointments;
-    @Transient
-    private List<Appointment> appointments;
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private Photo photo;
+
+    public void removeUserPhoto(){
+        if(this.getPhoto() != null){
+            this.setPhoto(null);
+        }
+    }
 
     public List<Appointment> getAppointments() {
         if(appointments == null){
