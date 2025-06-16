@@ -3,7 +3,7 @@ package com.dailycodework.universalpetcare.controller;
 import com.dailycodework.universalpetcare.dto.EntityConverter;
 import com.dailycodework.universalpetcare.dto.UserDTO;
 import com.dailycodework.universalpetcare.exception.ResourceNotFoundException;
-import com.dailycodework.universalpetcare.exception.UserAlreadyExistException;
+import com.dailycodework.universalpetcare.exception.AlreadyExistException;
 import com.dailycodework.universalpetcare.model.User;
 import com.dailycodework.universalpetcare.request.RegistrationRequest;
 import com.dailycodework.universalpetcare.request.UserUpdateRequest;
@@ -32,7 +32,7 @@ public class UserController {
             User theUser = userService.register(registrationRequest);
             UserDTO registeredUser = entityConverter.mapEntityToDTO(theUser, UserDTO.class);
             return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, registeredUser));
-        }catch (UserAlreadyExistException e){
+        }catch (AlreadyExistException e){
             return ResponseEntity.status(CONFLICT).body(new APIResponse(e.getMessage(), null));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));

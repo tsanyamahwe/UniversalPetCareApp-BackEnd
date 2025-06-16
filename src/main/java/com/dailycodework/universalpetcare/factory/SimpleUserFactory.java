@@ -1,6 +1,6 @@
 package com.dailycodework.universalpetcare.factory;
 
-import com.dailycodework.universalpetcare.exception.UserAlreadyExistException;
+import com.dailycodework.universalpetcare.exception.AlreadyExistException;
 import com.dailycodework.universalpetcare.model.User;
 import com.dailycodework.universalpetcare.repository.UserRepository;
 import com.dailycodework.universalpetcare.request.RegistrationRequest;
@@ -18,7 +18,7 @@ public class SimpleUserFactory implements UserFactory{
     @Override
     public User createUser(RegistrationRequest registrationRequest) {
         if(userRepository.existsByEmail(registrationRequest.getEmail())){
-            throw new UserAlreadyExistException("Oops! "+registrationRequest.getEmail()+ " already exist");
+            throw new AlreadyExistException("Oops! "+registrationRequest.getEmail()+ " already exist");
         }else{
             switch (registrationRequest.getUserType()){
                 case "VET" -> {return veterinarianFactory.createVeterinarian(registrationRequest);}

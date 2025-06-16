@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     Appointment findByAppointmentNo(String appointmentNo);
-    boolean existByVeterinarianIdAndPatientIdAndStatus(Long veterinarianId, Long reviewerId, AppointmentStatus appointmentStatus);
+    boolean existsByVeterinarianIdAndPatientIdAndStatus(Long veterinarianId, Long reviewerId, AppointmentStatus appointmentStatus);
 //    Appointment findByAppointmentDate(Date date);
 //    Appointment findAppointmentByTime(Time time);
 //    Appointment findAppointmentByAllSpecs(Long id, String appointmentNo, Date date, Time time);
