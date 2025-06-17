@@ -1,18 +1,21 @@
 package com.dailycodework.universalpetcare.service.appointment;
 
+import com.dailycodework.universalpetcare.dto.AppointmentDTO;
+import com.dailycodework.universalpetcare.dto.EntityConverter;
+import com.dailycodework.universalpetcare.dto.PetDTO;
 import com.dailycodework.universalpetcare.enums.AppointmentStatus;
 import com.dailycodework.universalpetcare.exception.ResourceNotFoundException;
 import com.dailycodework.universalpetcare.model.Appointment;
 import com.dailycodework.universalpetcare.model.Pet;
 import com.dailycodework.universalpetcare.model.User;
 import com.dailycodework.universalpetcare.repository.AppointmentRepository;
-import com.dailycodework.universalpetcare.repository.PetRepository;
 import com.dailycodework.universalpetcare.repository.UserRepository;
 import com.dailycodework.universalpetcare.request.AppointmentUpdateRequest;
 import com.dailycodework.universalpetcare.request.BookAppointmentRequest;
 import com.dailycodework.universalpetcare.service.pet.IPetService;
 import com.dailycodework.universalpetcare.utils.FeedBackMessage;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +29,9 @@ public class AppointmentService implements IAppointmentService{
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
     private final IPetService petService;
+    private final EntityConverter<Appointment, AppointmentDTO> entityConverter;
+    private final EntityConverter<Pet, PetDTO> petEntityConverter;
+    private final ModelMapper modelMapper;
 
     @Transactional
     @Override
@@ -79,19 +85,15 @@ public class AppointmentService implements IAppointmentService{
     public Appointment getAppointmentByNo(String appointmentNo) {
         return appointmentRepository.findByAppointmentNo(appointmentNo);
     }
-//
-//    @Override
-//    public Appointment getAppointmentByDate(Date appointmentDate) {
-//        return appointmentRepository.findByAppointmentDate(appointmentDate);
-//    }
-//
-//    @Override
-//    public Appointment getAppointmentByTime(Time appointmentTime) {
-//        return appointmentRepository.findAppointmentByTime(appointmentTime);
-//    }
-//
-//    @Override
-//    public Appointment getAppointmentByAllSpecs(Long id, String appointmentNo, Date appointmentDate, Time appointmentTime) {
-//        return appointmentRepository.findAppointmentByAllSpecs(id, appointmentNo, appointmentDate, appointmentTime);
-//    }
+
+    @Override
+    public List<AppointmentDTO> getUserAppointments(Long userId){
+        List<Appointment> appointments = appointmentRepository.findAllAppointmentsByUserId(userId);
+        return appointments.stream().map(appointment -> {
+            AppointmentDTO appointmentDTO = entityConverter.mapEntityToDTO(appointment, AppointmentDTO.class);
+            List<PetDTO> petDTO = appointment.getPets().stream().map(pet -> petEntityConverter.mapEntityToDTO(pet, PetDTO.class)).toList();
+            appointmentDTO.setPets(petDTO);
+            return appointmentDTO;
+        }).toList();
+    }
 }
