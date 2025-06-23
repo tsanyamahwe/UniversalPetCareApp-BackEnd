@@ -45,4 +45,10 @@ public class UrlMapping {
     public static final String DELETE_REVIEW = "/review/{reviewId}/delete";
     public static final String GET_AVG_REVIEWS = "/vet/{veterinarianId}/get-average-rating";
     /*====================== End Review API ===================*/
+
+    /*==================== Start Veterinarians API ===============*/
+    public static final String VETERINARIANS = API+"/veterinarians";
+    public static final String GET_ALL_VETERINARIANS = "/get-all-veterinarians";
+    public static final String SEARCH_VETERINARIAN_FOR_APPOINTMENT = "/search-veterinarian";
+    /*====================== End Veterinarians API ===================*/
 }

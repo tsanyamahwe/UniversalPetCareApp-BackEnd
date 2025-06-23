@@ -16,4 +16,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
     List<Review> findByVeterinarianId(Long veterinarianId);
     Optional<Review> findByVeterinarianIdAndPatientId(Long veterinarianId, Long reviewerId);
+    Long countByVeterinarianId(Long id);
 }
