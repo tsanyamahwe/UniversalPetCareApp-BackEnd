@@ -2,10 +2,12 @@ package com.dailycodework.universalpetcare.controller;
 
 import com.dailycodework.universalpetcare.exception.ResourceNotFoundException;
 import com.dailycodework.universalpetcare.model.Appointment;
+import com.dailycodework.universalpetcare.model.Pet;
 import com.dailycodework.universalpetcare.request.AppointmentUpdateRequest;
 import com.dailycodework.universalpetcare.request.BookAppointmentRequest;
 import com.dailycodework.universalpetcare.response.APIResponse;
 import com.dailycodework.universalpetcare.service.appointment.AppointmentService;
+import com.dailycodework.universalpetcare.service.pet.IPetService;
 import com.dailycodework.universalpetcare.utils.FeedBackMessage;
 import com.dailycodework.universalpetcare.utils.UrlMapping;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +18,13 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.*;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(UrlMapping.APPOINTMENTS)
 public class AppointmentController {
     private final AppointmentService appointmentService;
+    private final IPetService petService;
 
     @GetMapping(UrlMapping.ALL_APPOINTMENTS)
     public ResponseEntity<APIResponse> getAllAppointments(){
@@ -36,6 +40,11 @@ public class AppointmentController {
     public ResponseEntity<APIResponse> bookAppointment(@RequestBody BookAppointmentRequest bookAppointmentRequest, @RequestParam Long senderId, @RequestParam Long recipientId){
         try{
             Appointment theAppointment = appointmentService.createAppointment(bookAppointmentRequest, senderId, recipientId);
+            if(bookAppointmentRequest.getPet() != null && !bookAppointmentRequest.getPet().isEmpty()){
+                List<Pet> pets = bookAppointmentRequest.getPet();
+                pets.forEach(pet -> pet.setId(theAppointment.getId()));
+                petService.savePetForAppointment(pets);
+            }
             return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, theAppointment));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));

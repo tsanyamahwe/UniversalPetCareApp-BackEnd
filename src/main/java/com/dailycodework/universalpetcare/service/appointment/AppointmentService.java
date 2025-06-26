@@ -19,6 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,6 +42,9 @@ public class AppointmentService implements IAppointmentService{
         if(sender.isPresent() && recipient.isPresent()){
             Appointment appointment = bookAppointmentRequest.getAppointment();
             List<Pet> pets = bookAppointmentRequest.getPet();
+            if(pets == null){
+                pets= Collections.emptyList();
+            }
             pets.forEach(pet -> pet.setAppointment(appointment));
             List<Pet> savedPet = petService.savePetForAppointment(pets);
             appointment.setPets(savedPet);
@@ -48,7 +52,13 @@ public class AppointmentService implements IAppointmentService{
             appointment.addVeterinarian(recipient.get());
             appointment.setAppointmentNo();
             appointment.setStatus(AppointmentStatus.WAITING_FOR_APPROVAL);
-            return appointmentRepository.save(appointment);
+            Appointment savedAppointment = appointmentRepository.save(appointment);
+            if(bookAppointmentRequest.getPet() != null && !bookAppointmentRequest.getPet().isEmpty()){
+                List<Pet> pet = bookAppointmentRequest.getPet();
+                pet.forEach(petss -> {petss.setAppointment(savedAppointment);});
+                petService.savePetForAppointment(pet);
+            }
+            return savedAppointment;
         }
         throw new ResourceNotFoundException(FeedBackMessage.SENDER_RECIPIENT_NOT_FOUND);
     }
