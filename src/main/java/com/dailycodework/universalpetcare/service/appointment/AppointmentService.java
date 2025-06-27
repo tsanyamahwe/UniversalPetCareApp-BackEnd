@@ -52,13 +52,7 @@ public class AppointmentService implements IAppointmentService{
             appointment.addVeterinarian(recipient.get());
             appointment.setAppointmentNo();
             appointment.setStatus(AppointmentStatus.WAITING_FOR_APPROVAL);
-            Appointment savedAppointment = appointmentRepository.save(appointment);
-            if(bookAppointmentRequest.getPet() != null && !bookAppointmentRequest.getPet().isEmpty()){
-                List<Pet> pet = bookAppointmentRequest.getPet();
-                pet.forEach(petss -> {petss.setAppointment(savedAppointment);});
-                petService.savePetForAppointment(pet);
-            }
-            return savedAppointment;
+            return appointmentRepository.save(appointment);
         }
         throw new ResourceNotFoundException(FeedBackMessage.SENDER_RECIPIENT_NOT_FOUND);
     }
