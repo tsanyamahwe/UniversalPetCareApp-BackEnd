@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.*;
 
+@CrossOrigin("http://localhost:5173")
 @RequiredArgsConstructor
 @RequestMapping(UrlMapping.USERS)
 @RestController
@@ -56,7 +57,7 @@ public class UserController {
     public ResponseEntity<APIResponse> findById(@PathVariable Long userId){
         try{
             UserDTO userDTO = userService.getUserWithDetails(userId);
-            return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.RESOURCE_FOUND, userDTO));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, userDTO));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }catch (Exception e) {
