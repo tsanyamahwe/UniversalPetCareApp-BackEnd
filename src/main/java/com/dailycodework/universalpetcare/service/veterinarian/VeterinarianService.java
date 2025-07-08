@@ -88,4 +88,9 @@ public class VeterinarianService implements IVeterinarianService{
         }
         return userDTO;
     }
+
+    @Override
+    public List<String> getVeterinarianSpecializations(){
+        return veterinarianRepository.getDistinctVetSpecialization();
+    }
 }

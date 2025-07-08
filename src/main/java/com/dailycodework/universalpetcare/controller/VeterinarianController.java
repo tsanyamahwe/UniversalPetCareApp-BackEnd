@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @CrossOrigin("http://localhost:5173")
@@ -44,6 +45,16 @@ public class VeterinarianController {
             return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, availableVeterinarians));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping(UrlMapping.GET_VET_SPECIALIZATIONS)
+    public ResponseEntity<APIResponse> getAllSpecializations(){
+        try {
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, veterinarianService.getVeterinarianSpecializations()));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
+
         }
     }
 }

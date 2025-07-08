@@ -13,4 +13,6 @@ public interface IVeterinarianService {
     List<UserDTO> findAvailableVeterinariansForAppointment(String specialization, LocalDate date, LocalTime time);
 
     List<Veterinarian> getVeterinarianBySpecialization(String specialization);
+
+    List<String> getVeterinarianSpecializations();
 }

@@ -8,6 +8,7 @@ import com.dailycodework.universalpetcare.exception.ResourceNotFoundException;
 import com.dailycodework.universalpetcare.factory.UserFactory;
 import com.dailycodework.universalpetcare.model.Review;
 import com.dailycodework.universalpetcare.model.User;
+import com.dailycodework.universalpetcare.repository.ReviewRepository;
 import com.dailycodework.universalpetcare.repository.UserRepository;
 import com.dailycodework.universalpetcare.repository.VeterinarianRepository;
 import com.dailycodework.universalpetcare.request.RegistrationRequest;
@@ -35,6 +36,7 @@ public class UserService implements IUserService{
     private final AppointmentService appointmentService;
     private final PhotoService photoService;
     private final ReviewService reviewService;
+    private final ReviewRepository reviewRepository;
 
     @Override
     public User register(RegistrationRequest registrationRequest){
@@ -72,8 +74,10 @@ public class UserService implements IUserService{
     public UserDTO getUserWithDetails(Long userId) throws SQLException {
         //1. get the User
         User user = findById(userId);
+        System.out.println("=================== The user is ================ "+ user);
         //2. convert the User to a UserDTO
         UserDTO userDTO = entityConverter.mapEntityToDTO(user, UserDTO.class);
+        userDTO.setTotalReviewer(reviewRepository.countByVeterinarianId(userId));
         //3. get user appointments (users(patient and vet))
         setUserAppointment(userDTO);
         setUserPhoto(userDTO, user);
@@ -100,6 +104,7 @@ public class UserService implements IUserService{
         List<ReviewDTO> reviewDTO = pageReview.getContent().stream().map(this::mapReviewToDTO).toList();
         if(!reviewDTO.isEmpty()){
             double averageRating = reviewService.getAverageRatingForVet(userId);
+            userDTO.setAverageRating(averageRating);
         }
         userDTO.setReviews(reviewDTO);
     }
