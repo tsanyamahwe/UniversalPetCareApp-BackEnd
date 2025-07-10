@@ -5,9 +5,11 @@ import com.dailycodework.universalpetcare.dto.UserDTO;
 import com.dailycodework.universalpetcare.exception.ResourceNotFoundException;
 import com.dailycodework.universalpetcare.exception.AlreadyExistException;
 import com.dailycodework.universalpetcare.model.User;
+import com.dailycodework.universalpetcare.request.ChangePasswordRequest;
 import com.dailycodework.universalpetcare.request.RegistrationRequest;
 import com.dailycodework.universalpetcare.request.UserUpdateRequest;
 import com.dailycodework.universalpetcare.response.APIResponse;
+import com.dailycodework.universalpetcare.service.password.IChangePasswordService;
 import com.dailycodework.universalpetcare.service.user.UserService;
 import com.dailycodework.universalpetcare.utils.FeedBackMessage;
 import com.dailycodework.universalpetcare.utils.UrlMapping;
@@ -26,6 +28,7 @@ import static org.springframework.http.HttpStatus.*;
 public class UserController {
     private final UserService userService;
     private final EntityConverter<User, UserDTO> entityConverter;
+    private final IChangePasswordService changePasswordService;
 
     @PostMapping(UrlMapping.REGISTER_USER)
     public ResponseEntity<APIResponse> register(@RequestBody RegistrationRequest registrationRequest){
@@ -81,5 +84,19 @@ public class UserController {
     public ResponseEntity<APIResponse> getAllUsers(){
         List<UserDTO> theUsers = userService.getAllUsers();
         return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.RESOURCE_FOUND, theUsers));
+    }
+
+    @PutMapping(UrlMapping.CHANGE_PASSWORD)
+    public ResponseEntity<APIResponse> changePassword(@PathVariable Long userId, @RequestBody ChangePasswordRequest changePasswordRequest){
+        try{
+            changePasswordService.changePassword(userId, changePasswordRequest);
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, null));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(new APIResponse(e.getMessage(), null));
+        }catch(ResourceNotFoundException e){
+            return  ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
+        }catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
+        }
     }
 }
