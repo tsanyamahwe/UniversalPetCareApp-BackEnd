@@ -22,7 +22,10 @@ public class ChangePasswordService implements IChangePasswordService{
             throw new IllegalArgumentException("All fields are required");
         }
         if(!Objects.equals(changePasswordRequest.getCurrentPassword(), user.getPassword())){
-            throw new IllegalArgumentException("Current Password does not match");
+            throw new IllegalArgumentException("Current password does not match (it is not correct)");
+        }
+        if(Objects.equals(changePasswordRequest.getNewPassword(), changePasswordRequest.getCurrentPassword())){
+            throw new IllegalArgumentException("New password must be different from current password");
         }
         if(!Objects.equals(changePasswordRequest.getNewPassword(), changePasswordRequest.getConfirmNewPassword())){
             throw new IllegalArgumentException("Password confirmation mis-match");

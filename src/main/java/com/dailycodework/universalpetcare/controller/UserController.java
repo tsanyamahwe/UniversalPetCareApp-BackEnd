@@ -91,7 +91,7 @@ public class UserController {
         try{
             changePasswordService.changePassword(userId, changePasswordRequest);
             return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, null));
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new APIResponse(e.getMessage(), null));
         }catch(ResourceNotFoundException e){
             return  ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
