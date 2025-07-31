@@ -22,6 +22,7 @@ public class Pet {
     private String color;
     private String breed;
     private int age;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "appointment_id", nullable = true)
     private Appointment appointment;
 }

@@ -42,7 +42,7 @@ public class Appointment {
     private User veterinarian;
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
-    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     List<Pet> pets = new ArrayList<>();
 
     public void addPatient(User sender){

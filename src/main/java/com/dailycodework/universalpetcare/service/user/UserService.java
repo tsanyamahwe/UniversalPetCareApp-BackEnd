@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -64,15 +65,45 @@ public class UserService implements IUserService{
     }
 
     @Override
+    @Transactional
+//    public void delete(Long userId){
+//        userRepository.findById(userId)
+//                .ifPresentOrElse(userToDelete ->{
+//                    List<Review> reviews = new ArrayList<>(reviewRepository.findAllByUserId(userId));
+//                    reviewRepository.deleteAll(reviews);
+//                    List<Appointment> appointments = new ArrayList<>(appointmentRepository.findAllAppointmentsByUserId(userId));
+//                    for(Appointment appointment: appointments) {
+//                        appointmentRepository.delete(appointment);
+//                    }
+//                    userRepository.deleteById(userId);
+//                    }, ()-> {throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);});
+//    }
     public void delete(Long userId){
         userRepository.findById(userId)
-                .ifPresentOrElse(userToDelete ->{
+                .ifPresentOrElse(userToDelete -> {
+                    // Delete reviews first
                     List<Review> reviews = new ArrayList<>(reviewRepository.findAllByUserId(userId));
                     reviewRepository.deleteAll(reviews);
+
+                    // Get all appointments for this user
                     List<Appointment> appointments = new ArrayList<>(appointmentRepository.findAllAppointmentsByUserId(userId));
-                    appointmentRepository.deleteAll(appointments);
+
+                    // For each appointment, explicitly clear pets if needed
+                    for (Appointment appointment : appointments) {
+                        // Force loading of pets and clear the relationship
+                        appointment.getPets().clear();
+                    }
+
+                    // Delete appointments - this should cascade to pets
+                    if (!appointments.isEmpty()) {
+                        appointmentRepository.deleteAll(appointments);
+                    }
+
+                    // Finally delete the user
                     userRepository.deleteById(userId);
-                    }, ()-> {throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);});
+                }, () -> {
+                    throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);
+                });
     }
 
     @Override
