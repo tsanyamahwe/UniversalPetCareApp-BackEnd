@@ -125,12 +125,8 @@ public class AppointmentService implements IAppointmentService{
 
     public void deleteAppointmentById(Long id) {
         appointmentRepository.findById(id).ifPresentOrElse(appointment -> {
-            // Get all pets for this appointment
+            // Get all pets for this appointment, and delete them
             List<Pet> pets = appointment.getPets();
-
-            System.out.println("Deleting " + pets.size() + " pets manually");
-
-            // Delete pets first
             if (!pets.isEmpty()) {
                 petRepository.deleteAll(pets);
             }
@@ -141,7 +137,6 @@ public class AppointmentService implements IAppointmentService{
             // Delete the appointment
             appointmentRepository.delete(appointment);
 
-            System.out.println("Appointment and pets deleted successfully");
         }, () -> {
             throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);
         });

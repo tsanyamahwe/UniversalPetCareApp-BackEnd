@@ -81,25 +81,18 @@ public class UserService implements IUserService{
     public void delete(Long userId){
         userRepository.findById(userId)
                 .ifPresentOrElse(userToDelete -> {
-                    // Delete reviews first
+                    //Delete Reviews first
                     List<Review> reviews = new ArrayList<>(reviewRepository.findAllByUserId(userId));
                     reviewRepository.deleteAll(reviews);
 
-                    // Get all appointments for this user
-                    List<Appointment> appointments = new ArrayList<>(appointmentRepository.findAllAppointmentsByUserId(userId));
-
-                    // For each appointment, explicitly clear pets if needed
-                    for (Appointment appointment : appointments) {
-                        // Force loading of pets and clear the relationship
-                        appointment.getPets().clear();
+                    //Delete each appointment by ID
+                    List<AppointmentDTO> appointments = appointmentService.getUserAppointments(userId);
+                    for (AppointmentDTO appointment : appointments) {
+                        //force loading of pets and clear the relationship
+                        appointmentService.deleteAppointmentById(appointment.getId());
                     }
 
-                    // Delete appointments - this should cascade to pets
-                    if (!appointments.isEmpty()) {
-                        appointmentRepository.deleteAll(appointments);
-                    }
-
-                    // Finally delete the user
+                    //Finally delete the user
                     userRepository.deleteById(userId);
                 }, () -> {
                     throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);
