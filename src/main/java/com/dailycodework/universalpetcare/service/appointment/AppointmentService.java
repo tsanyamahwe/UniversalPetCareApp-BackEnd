@@ -62,34 +62,48 @@ public class AppointmentService implements IAppointmentService{
     public Appointment createAppointment(BookAppointmentRequest bookAppointmentRequest, Long senderId, Long recipientId) {
         Optional<User> sender = userRepository.findById(senderId);
         Optional<User> recipient = userRepository.findById(recipientId);
+
         if(sender.isPresent() && recipient.isPresent()){
             Appointment appointment = bookAppointmentRequest.getAppointment();
+            List<Pet> pets = bookAppointmentRequest.getPet();
+
+            // Set up appointment basic info
             appointment.addPatient(sender.get());
             appointment.addVeterinarian(recipient.get());
             appointment.setAppointmentNo();
             appointment.setStatus(AppointmentStatus.WAITING_FOR_APPROVAL);
 
-            // Get pets from request
-            List<Pet> pets = bookAppointmentRequest.getPet();
-            if(pets != null && !pets.isEmpty()) {
-                // Set the bidirectional relationship properly
-                for(Pet pet : pets) {
-                    pet.setAppointment(appointment);
-                }
-                appointment.setPets(new ArrayList<>(pets));
-            }
-
-            // Let JPA cascade handle everything
+            // First save the appointment to get the ID
             Appointment savedAppointment = appointmentRepository.save(appointment);
+
+            // Now handle pets with the actual appointment ID
+            if(pets != null && !pets.isEmpty()) {
+                for(Pet pet : pets) {
+                    // Set the appointment ID (now available after save)
+                    //pet.setAppointmentId(savedAppointment.getId()); // or however you store the foreign key
+                    pet.setAppointment(savedAppointment);
+                }
+
+                // Save pets with appointment reference
+                petService.savePetForAppointment(pets);
+
+                // Update the appointment's pet list
+                savedAppointment.setPets(new ArrayList<>(pets));
+
+                // Save appointment again to update the relationship
+                savedAppointment = appointmentRepository.save(savedAppointment);
+            }
 
             // Debug: Print what was saved
             System.out.println("=== DEBUG INFO ===");
             System.out.println("Appointment ID: " + savedAppointment.getId());
-            System.out.println("Number of pets: " + savedAppointment.getPets().size());
-            savedAppointment.getPets().forEach(pet -> {
-                System.out.println("Pet ID: " + pet.getId() + ", Name: " + pet.getName() +
-                        ", Appointment ID: " + (pet.getAppointment() != null ? pet.getAppointment().getId() : "NULL"));
-            });
+            System.out.println("Number of pets: " + (savedAppointment.getPets() != null ? savedAppointment.getPets().size() : 0));
+            if(savedAppointment.getPets() != null) {
+                savedAppointment.getPets().forEach(pet -> {
+                    System.out.println("Pet ID: " + pet.getId() + ", Name: " + pet.getName() +
+                            ", Appointment ID: " + (pet.getAppointment() != null ? pet.getAppointment().getId() : "NULL"));
+                });
+            }
 
             return savedAppointment;
         }

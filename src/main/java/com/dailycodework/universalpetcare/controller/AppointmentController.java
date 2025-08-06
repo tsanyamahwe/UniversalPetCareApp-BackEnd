@@ -40,11 +40,6 @@ public class AppointmentController {
     public ResponseEntity<APIResponse> bookAppointment(@RequestBody BookAppointmentRequest bookAppointmentRequest, @RequestParam Long senderId, @RequestParam Long recipientId){
         try{
             Appointment theAppointment = appointmentService.createAppointment(bookAppointmentRequest, senderId, recipientId);
-            if(bookAppointmentRequest.getPet() != null && !bookAppointmentRequest.getPet().isEmpty()){
-                List<Pet> pets = bookAppointmentRequest.getPet();
-                pets.forEach(pet -> pet.setId(theAppointment.getId()));
-                petService.savePetForAppointment(pets);
-            }
             return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, theAppointment));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
