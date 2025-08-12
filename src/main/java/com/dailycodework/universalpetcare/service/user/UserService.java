@@ -109,7 +109,7 @@ public class UserService implements IUserService{
     public UserDTO getUserWithDetails(Long userId) throws SQLException {
         //1. get the User
         User user = findById(userId);
-        System.out.println("=================== The user is ================ "+ user);
+        System.out.println("====== The user is ====== "+ user);
         //2. convert the User to a UserDTO
         UserDTO userDTO = entityConverter.mapEntityToDTO(user, UserDTO.class);
         userDTO.setTotalReviewer(reviewRepository.countByVeterinarianId(userId));

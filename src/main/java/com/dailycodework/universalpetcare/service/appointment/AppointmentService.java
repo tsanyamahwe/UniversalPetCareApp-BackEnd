@@ -35,76 +35,39 @@ public class AppointmentService implements IAppointmentService{
 
     @Transactional
     @Override
-//    public Appointment createAppointment(BookAppointmentRequest bookAppointmentRequest, Long senderId, Long recipientId) {
-//        Optional<User> sender = userRepository.findById(senderId);
-//        Optional<User> recipient = userRepository.findById(recipientId);
-//        if(sender.isPresent() && recipient.isPresent()){
-//            Appointment appointment = bookAppointmentRequest.getAppointment();
-//            List<Pet> pets = bookAppointmentRequest.getPet();
-//            if(pets == null){
-//                pets= Collections.emptyList();
-//            }
-//            appointment.addPatient(sender.get());
-//            appointment.addVeterinarian(recipient.get());
-//            appointment.setAppointmentNo();
-//            appointment.setStatus(AppointmentStatus.WAITING_FOR_APPROVAL);
-//
-//            Appointment savedAppointment = appointmentRepository.save(appointment);
-//            pets.forEach(pet -> pet.setAppointment(savedAppointment));
-//            List<Pet> savedPet = petService.savePetForAppointment(pets);
-//
-//            savedAppointment.setPets(savedPet);
-//
-//            return savedAppointment;
-//        }
-//        throw new ResourceNotFoundException(FeedBackMessage.SENDER_RECIPIENT_NOT_FOUND);
-//    }
     public Appointment createAppointment(BookAppointmentRequest bookAppointmentRequest, Long senderId, Long recipientId) {
         Optional<User> sender = userRepository.findById(senderId);
         Optional<User> recipient = userRepository.findById(recipientId);
 
         if(sender.isPresent() && recipient.isPresent()){
             Appointment appointment = bookAppointmentRequest.getAppointment();
-            List<Pet> pets = bookAppointmentRequest.getPet();
-
-            // Set up appointment basic info
             appointment.addPatient(sender.get());
             appointment.addVeterinarian(recipient.get());
             appointment.setAppointmentNo();
             appointment.setStatus(AppointmentStatus.WAITING_FOR_APPROVAL);
 
-            // First save the appointment to get the ID
             Appointment savedAppointment = appointmentRepository.save(appointment);
+            System.out.println("Appointment ID: " + savedAppointment.getId());
 
-            // Now handle pets with the actual appointment ID
+            List<Pet> pets = bookAppointmentRequest.getPet();
             if(pets != null && !pets.isEmpty()) {
                 for(Pet pet : pets) {
-                    // Set the appointment ID (now available after save)
-                    //pet.setAppointmentId(savedAppointment.getId()); // or however you store the foreign key
                     pet.setAppointment(savedAppointment);
+                    savedAppointment.getPets().add(pet);
                 }
-
-                // Save pets with appointment reference
-                petService.savePetForAppointment(pets);
-
-                // Update the appointment's pet list
                 savedAppointment.setPets(new ArrayList<>(pets));
-
-                // Save appointment again to update the relationship
                 savedAppointment = appointmentRepository.save(savedAppointment);
+                petService.savePetForAppointment(pets);
+                System.out.println("Number of pets: " + (savedAppointment.getPets() != null ? savedAppointment.getPets().size() : 0));
             }
-
-            // Debug: Print what was saved
             System.out.println("=== DEBUG INFO ===");
-            System.out.println("Appointment ID: " + savedAppointment.getId());
-            System.out.println("Number of pets: " + (savedAppointment.getPets() != null ? savedAppointment.getPets().size() : 0));
+
             if(savedAppointment.getPets() != null) {
                 savedAppointment.getPets().forEach(pet -> {
                     System.out.println("Pet ID: " + pet.getId() + ", Name: " + pet.getName() +
                             ", Appointment ID: " + (pet.getAppointment() != null ? pet.getAppointment().getId() : "NULL"));
                 });
             }
-
             return savedAppointment;
         }
         throw new ResourceNotFoundException(FeedBackMessage.SENDER_RECIPIENT_NOT_FOUND);
