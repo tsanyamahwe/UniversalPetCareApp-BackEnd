@@ -9,10 +9,8 @@ public interface IPetService {
     Pet updatePet(Pet pet, Long id);
     void deletePet(Long id);
     Pet getPetById(Long id);
-
     List<String> getPetTypes();
-
     List<String> getPetColors();
-
     List<String> getPetBreeds(String petType);
+    Pet addPetToExistingAppointment(Long appointmentId, Pet pet);
 }

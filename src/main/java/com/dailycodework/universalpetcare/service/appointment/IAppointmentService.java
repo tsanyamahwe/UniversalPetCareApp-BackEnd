@@ -18,6 +18,12 @@ public interface IAppointmentService {
     Appointment getAppointmentByNo(String appointmentNo);
 
     List<AppointmentDTO> getUserAppointments(Long userId);
+
+    Appointment cancelAppointment(Long appointmentId);
+
+    Appointment approveAppointment(Long appointmentId);
+
+    Appointment declineAppointment(Long appointmentId);
 //    Appointment getAppointmentByDate(Date appointmentDate);
 //    Appointment getAppointmentByTime(Time appointmentTime);
 //    Appointment getAppointmentByAllSpecs(Long id, String appointmentNo, Date appointmentDate, Time appointmentTime);

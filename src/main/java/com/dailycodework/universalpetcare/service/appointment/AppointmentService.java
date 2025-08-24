@@ -46,32 +46,18 @@ public class AppointmentService implements IAppointmentService{
             appointment.setAppointmentNo();
             appointment.setStatus(AppointmentStatus.WAITING_FOR_APPROVAL);
 
-            Appointment savedAppointment = appointmentRepository.save(appointment);
-            System.out.println("Appointment ID: " + savedAppointment.getId());
-
-            List<Pet> pets = bookAppointmentRequest.getPet();
+            List<Pet> pets = bookAppointmentRequest.getPets();
             if(pets != null && !pets.isEmpty()) {
                 for(Pet pet : pets) {
-                    pet.setAppointment(savedAppointment);
-                    savedAppointment.getPets().add(pet);
+                    pet.setAppointment(appointment);
                 }
-                savedAppointment.setPets(new ArrayList<>(pets));
-                savedAppointment = appointmentRepository.save(savedAppointment);
-                petService.savePetForAppointment(pets);
-                System.out.println("Number of pets: " + (savedAppointment.getPets() != null ? savedAppointment.getPets().size() : 0));
+                appointment.setPets(new ArrayList<>(pets));
             }
-            System.out.println("=== DEBUG INFO ===");
-
-            if(savedAppointment.getPets() != null) {
-                savedAppointment.getPets().forEach(pet -> {
-                    System.out.println("Pet ID: " + pet.getId() + ", Name: " + pet.getName() +
-                            ", Appointment ID: " + (pet.getAppointment() != null ? pet.getAppointment().getId() : "NULL"));
-                });
-            }
-            return savedAppointment;
+            return appointmentRepository.save(appointment);
         }
         throw new ResourceNotFoundException(FeedBackMessage.SENDER_RECIPIENT_NOT_FOUND);
     }
+
 
     @Override
     public List<Appointment> getAllAppointments() {
@@ -138,5 +124,28 @@ public class AppointmentService implements IAppointmentService{
             appointmentDTO.setPets(petDTO);
             return appointmentDTO;
         }).toList();
+    }
+
+    @Override
+    public Appointment cancelAppointment(Long appointmentId){
+        return appointmentRepository.findById(appointmentId).filter(appointment -> appointment.getStatus().equals(AppointmentStatus.WAITING_FOR_APPROVAL))
+                .map(appointment -> {appointment.setStatus(AppointmentStatus.CANCELLED);
+                return appointmentRepository.saveAndFlush(appointment);
+                }).orElseThrow(()-> new IllegalStateException(FeedBackMessage.CANNOT_CANCEL_APPOINTMENT));
+    }
+
+    @Override
+    public Appointment approveAppointment(Long appointmentId){
+        return appointmentRepository.findById(appointmentId).filter(appointment -> !appointment.getStatus().equals(AppointmentStatus.APPROVED))
+                .map(appointment -> {appointment.setStatus(AppointmentStatus.APPROVED);
+                    return appointmentRepository.saveAndFlush(appointment);
+                }).orElseThrow(()-> new IllegalStateException(FeedBackMessage.APPOINTMENT_ALREADY_APPROVED));
+    }
+
+    @Override
+    public Appointment declineAppointment(Long appointmentId){
+        return appointmentRepository.findById(appointmentId).map(appointment -> {appointment.setStatus(AppointmentStatus.NOT_APPROVED);
+                    return appointmentRepository.saveAndFlush(appointment);
+                }).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.RESOURCE_NOT_FOUND));
     }
 }

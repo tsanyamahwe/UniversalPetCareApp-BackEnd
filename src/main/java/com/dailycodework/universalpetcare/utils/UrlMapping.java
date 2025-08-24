@@ -15,10 +15,13 @@ public class UrlMapping {
     public static final String APPOINTMENTS = API+"/appointments";
     public static final String ALL_APPOINTMENTS = "/all";
     public static final String BOOK_APPOINTMENT = "/book-appointment";
-    public static final String GET_APPOINTMENT_BY_ID = "/appointment/{id}";
+    public static final String GET_APPOINTMENT_BY_ID = "/appointment/{id}/fetchappointment";
     public static final String GET_APPOINTMENT_BY_NO = "/appointment/{appointmentNo}/appointment";
     public static final String DELETE_APPOINTMENT = "/appointment/{id}/delete";
     public static final String UPDATE_APPOINTMENT = "/appointment/{id}/update";
+    public static final String CANCEL_APPOINTMENT = "/appointment/{id}/cancel";
+    public static final String APPROVE_APPOINTMENT = "/appointment/{id}/approve";
+    public static final String DECLINE_APPOINTMENT = "/appointment/{id}/decline";
     /*================ End Appointment API ===============*/
 
     /*================ Start Pet API =====================*/
@@ -30,6 +33,7 @@ public class UrlMapping {
     public static final String GET_PET_TYPES = "/get-pet-types";
     public static final String GET_PET_COLORS = "/get-pet-colors";
     public static final String GET_PET_BREEDS = "/get-pet-breeds";
+    public static final String ADD_PET_TO_APPOINTMENT = "/save-pet-for-appointment/{appointmentId}";
     /*=============== End Pet API =======================*/
 
     /*================== Start Photo API ================*/

@@ -11,5 +11,5 @@ import java.util.List;
 @Setter
 public class BookAppointmentRequest {
     private Appointment appointment;
-    private List<Pet> pet;
+    private List<Pet> pets;
 }

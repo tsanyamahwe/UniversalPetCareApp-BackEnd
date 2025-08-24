@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @CrossOrigin("http://localhost:5173")
 @RestController
@@ -25,8 +24,8 @@ public class PetController {
     @PostMapping(UrlMapping.SAVE_PETS_FOR_APPOINTMENTS)
     public ResponseEntity<APIResponse> savePets(@RequestBody List<Pet> pets){
         try {
-            List<Pet> savedPets = petService.savePetForAppointment(pets);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, savedPets));
+           // List<Pet> savedPets = petService.savePetForAppointment(pets, true);
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, pets));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
         }
@@ -81,5 +80,17 @@ public class PetController {
     @GetMapping(UrlMapping.GET_PET_BREEDS)
     public ResponseEntity<APIResponse> getAllPetBreeds(@RequestParam String petType){
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, petService.getPetBreeds(petType)));
+    }
+
+    @PostMapping(UrlMapping.ADD_PET_TO_APPOINTMENT)
+    public ResponseEntity<APIResponse> addPetToAppointment(@PathVariable Long appointmentId, @RequestBody Pet pet) {
+        try {
+            Pet savedPet = petService.addPetToExistingAppointment(appointmentId, pet);
+            return ResponseEntity.ok(new APIResponse("Pet added successfully to appointment", savedPet));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(BAD_REQUEST).body(new APIResponse(e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
+        }
     }
 }
