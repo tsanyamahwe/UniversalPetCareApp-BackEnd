@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -96,6 +97,41 @@ public class UserController {
         }catch(ResourceNotFoundException e){
             return  ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping(UrlMapping.COUNT_ALL_VETS)
+    public long countVeterinarians(){
+        return userService.countVeterinarians();
+    }
+
+    @GetMapping(UrlMapping.COUNT_ALL_PATIENTS)
+    public long countPatients(){
+        return userService.countPatients();
+    }
+
+    @GetMapping(UrlMapping.COUNT_ALL_USERS)
+    public long countUsers(){
+        return userService.countAllUsers();
+    }
+
+    @GetMapping(UrlMapping.AGGREGATE_USERS)
+    public ResponseEntity<APIResponse> aggregateUsersByMonthAndType(){
+        try {
+            Map<String, Map<String, Long>> aggregatedUsers = userService.aggregateUsersByMonthAndType();
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, aggregatedUsers));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping(UrlMapping.AGGREGATE_STATUS)
+    public ResponseEntity<APIResponse> aggregateUsersByEnabledStatusAndType(){
+        try{
+            Map<String, Map<String, Long>> aggregatedData = userService.aggregatesUsersByEnabledStatusAndType();
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, aggregatedData));
+        } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
         }
     }

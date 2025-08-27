@@ -1,5 +1,8 @@
 package com.dailycodework.universalpetcare.utils;
 
+import java.util.List;
+import java.util.Map;
+
 public class FeedBackMessage {
     public static final String CREATE_SUCCESS = "Resource created successfully";
     public static final String UPDATE_SUCCESS = "Resource updated successfully";
@@ -26,4 +29,7 @@ public class FeedBackMessage {
     public static final String COLOR_REQUIRED = "Pet color is required";
     public static final String AGE_REQUIREMENT = "Pet age must be a valid positive number";
     public static final String NOT_AVAILABLE = "No Appointment with the associated ID";
+    public static final String SUCCESS_SUMMARY = "Appointment summary retrieved successfully";
+    public static final String ERROR_SUMMARY = "Error retrieving summary: ";
+    public static final String NO_VETERINARIANS = "No veterinarians registered yet";
 }

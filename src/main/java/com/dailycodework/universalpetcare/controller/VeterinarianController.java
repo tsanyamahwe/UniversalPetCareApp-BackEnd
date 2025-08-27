@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -56,5 +57,11 @@ public class VeterinarianController {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
 
         }
+    }
+
+    @GetMapping(UrlMapping.VETS_AGGREGATE_BY_SPECIALIZATION)
+    public ResponseEntity<List<Map<String, Object>>> aggregateVeterinariansBySpecialization(){
+            List<Map<String, Object>> aggregatedVeterinarians = veterinarianService.aggregateVeterinariansBySpecialization();
+            return ResponseEntity.ok(aggregatedVeterinarians);
     }
 }

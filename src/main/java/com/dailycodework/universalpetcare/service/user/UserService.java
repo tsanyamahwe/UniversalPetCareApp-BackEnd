@@ -6,7 +6,6 @@ import com.dailycodework.universalpetcare.dto.ReviewDTO;
 import com.dailycodework.universalpetcare.dto.UserDTO;
 import com.dailycodework.universalpetcare.exception.ResourceNotFoundException;
 import com.dailycodework.universalpetcare.factory.UserFactory;
-import com.dailycodework.universalpetcare.model.Appointment;
 import com.dailycodework.universalpetcare.model.Review;
 import com.dailycodework.universalpetcare.model.User;
 import com.dailycodework.universalpetcare.repository.AppointmentRepository;
@@ -26,8 +25,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -194,5 +197,35 @@ public class UserService implements IUserService{
         }else{
             reviewDTO.setVeterinarianPhoto(null);
         }
+    }
+
+    @Override
+    public long countVeterinarians(){
+        return userRepository.countByUserType("VET");
+    }
+
+    @Override
+    public long countPatients(){
+        return userRepository.countByUserType("PATIENT");
+    }
+
+    @Override
+    public long countAllUsers(){
+        return userRepository.count();
+    }
+
+    @Override
+    public Map<String, Map<String, Long>> aggregateUsersByMonthAndType(){
+        List<User> users = userRepository.findAll();
+        return users.stream().collect(Collectors.groupingBy(user -> Month.of(user.getCreatedAt().getMonthValue())
+                .getDisplayName(TextStyle.FULL, Locale.ENGLISH), Collectors.groupingBy(User::getUserType, Collectors.counting())
+        ));
+    }
+
+    @Override
+    public Map<String, Map<String, Long>> aggregatesUsersByEnabledStatusAndType(){
+        List<User> users = userRepository.findAll();
+        return users.stream().collect(Collectors.groupingBy(user -> user.isEnabled() ? "Enabled" : "Non-Enabled",
+                Collectors.groupingBy(User::getUserType, Collectors.counting())));
     }
 }

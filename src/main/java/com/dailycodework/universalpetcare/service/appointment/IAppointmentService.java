@@ -24,6 +24,10 @@ public interface IAppointmentService {
     Appointment approveAppointment(Long appointmentId);
 
     Appointment declineAppointment(Long appointmentId);
+
+    long countAppointments();
+
+    List<Map<String, Object>> getAppointmentStatusSummary();
 //    Appointment getAppointmentByDate(Date appointmentDate);
 //    Appointment getAppointmentByTime(Time appointmentTime);
 //    Appointment getAppointmentByAllSpecs(Long id, String appointmentNo, Date appointmentDate, Time appointmentTime);

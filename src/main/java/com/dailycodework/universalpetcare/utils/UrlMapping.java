@@ -9,6 +9,11 @@ public class UrlMapping {
     public static final String GET_USER_BY_ID = "/user/{userId}";
     public static final String DELETE_USER_BY_ID = "/delete/{userId}";
     public static final String GET_ALL_USERS = "/all-users";
+    public static final String COUNT_ALL_USERS = "/count/users";
+    public static final String COUNT_ALL_VETS = "/count/veterinarians";
+    public static final String COUNT_ALL_PATIENTS = "/count/patients";
+    public static final String AGGREGATE_USERS = "/aggregated-users";
+    public static final String AGGREGATE_STATUS = "/accounts/aggregated-by-status";
     /*============= End End User API ==================*/
 
     /*============= Start Appointment API =============*/
@@ -22,6 +27,8 @@ public class UrlMapping {
     public static final String CANCEL_APPOINTMENT = "/appointment/{id}/cancel";
     public static final String APPROVE_APPOINTMENT = "/appointment/{id}/approve";
     public static final String DECLINE_APPOINTMENT = "/appointment/{id}/decline";
+    public static final String COUNT_APPOINTMENTS = "/count/appointments";
+    public static final String APPOINTMENT_SUMMARY = "/summary/appointments-summary";
     /*================ End Appointment API ===============*/
 
     /*================ Start Pet API =====================*/
@@ -58,6 +65,7 @@ public class UrlMapping {
     public static final String GET_ALL_VETERINARIANS = "/get-all-veterinarians";
     public static final String SEARCH_VETERINARIAN_FOR_APPOINTMENT = "/search-veterinarian";
     public static final String GET_VET_SPECIALIZATIONS = "/get-vet-specializations";
+    public static final String VETS_AGGREGATE_BY_SPECIALIZATION = "/aggregate-vets-by-specialization";
     /*====================== End Veterinarians API ===================*/
 
     /*==================== Start Change Password API ====================*/

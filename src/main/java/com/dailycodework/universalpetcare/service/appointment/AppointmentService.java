@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -147,5 +148,33 @@ public class AppointmentService implements IAppointmentService{
         return appointmentRepository.findById(appointmentId).map(appointment -> {appointment.setStatus(AppointmentStatus.NOT_APPROVED);
                     return appointmentRepository.saveAndFlush(appointment);
                 }).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.RESOURCE_NOT_FOUND));
+    }
+
+    @Override
+    public long countAppointments(){
+        return  appointmentRepository.count();
+    }
+
+    private String formatAppointmentStatus(AppointmentStatus appointmentStatus){
+        return appointmentStatus.toString().replace("_", "-").toLowerCase();
+    }
+
+    private Map<String, Object> createStatusSummaryMap(AppointmentStatus appointmentStatus, Long value){
+        Map<String, Object> summaryMap = new HashMap<>();
+        summaryMap.put("name", formatAppointmentStatus(appointmentStatus));
+        summaryMap.put("value", value);
+        return summaryMap;
+    }
+
+    @Override
+    public List<Map<String, Object>> getAppointmentStatusSummary(){
+        return getAllAppointments()
+                .stream()
+                .collect(Collectors.groupingBy(Appointment::getStatus, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() > 0)
+                .map(entry -> createStatusSummaryMap(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
     }
 }

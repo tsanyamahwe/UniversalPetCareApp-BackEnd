@@ -6,6 +6,7 @@ import com.dailycodework.universalpetcare.model.Veterinarian;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 public interface IVeterinarianService {
     List<UserDTO> getAllVeterinariansWithDetails();
@@ -15,4 +16,6 @@ public interface IVeterinarianService {
     List<Veterinarian> getVeterinarianBySpecialization(String specialization);
 
     List<String> getVeterinarianSpecializations();
+
+    List<Map<String, Object>> aggregateVeterinariansBySpecialization();
 }
