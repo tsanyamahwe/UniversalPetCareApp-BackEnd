@@ -14,6 +14,8 @@ public class UrlMapping {
     public static final String COUNT_ALL_PATIENTS = "/count/patients";
     public static final String AGGREGATE_USERS = "/aggregated-users";
     public static final String AGGREGATE_STATUS = "/accounts/aggregated-by-status";
+    public static final String LOCK_USER_ACCOUNT = "/account/{userId}/lock-user-account";
+    public static final String UNLOCK_USER_ACCOUNT = "/account/{userId}/unlock-user-account";
     /*============= End End User API ==================*/
 
     /*============= Start Appointment API =============*/
@@ -71,4 +73,9 @@ public class UrlMapping {
     /*==================== Start Change Password API ====================*/
     public static final String CHANGE_PASSWORD = "/user/{userId}/change-password";
     /*===================== End Change Password API ====================*/
+
+    /*+=======================Start Patients API==========================*/
+    public static final String PATIENTS = API+"/patients";
+    public static final String GET_ALL_PATIENTS = "/get-all-patients";
+    /*=========================End Patients API============================*/
 }

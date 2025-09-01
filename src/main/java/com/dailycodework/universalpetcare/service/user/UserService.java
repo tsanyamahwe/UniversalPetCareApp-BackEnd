@@ -68,6 +68,11 @@ public class UserService implements IUserService{
     }
 
     @Override
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+    }
+
+    @Override
     @Transactional
 //    public void delete(Long userId){
 //        userRepository.findById(userId)
@@ -227,5 +232,15 @@ public class UserService implements IUserService{
         List<User> users = userRepository.findAll();
         return users.stream().collect(Collectors.groupingBy(user -> user.isEnabled() ? "Enabled" : "Non-Enabled",
                 Collectors.groupingBy(User::getUserType, Collectors.counting())));
+    }
+
+    @Override
+    public void lockUserAccount(Long userId){
+        userRepository.updateUserEnabledStatus(userId, false);
+    }
+
+    @Override
+    public void unLockUserAccount(Long userId){
+        userRepository.updateUserEnabledStatus(userId, true);
     }
 }

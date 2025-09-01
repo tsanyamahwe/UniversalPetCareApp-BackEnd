@@ -32,4 +32,6 @@ public class FeedBackMessage {
     public static final String SUCCESS_SUMMARY = "Appointment summary retrieved successfully";
     public static final String ERROR_SUMMARY = "Error retrieving summary: ";
     public static final String NO_VETERINARIANS = "No veterinarians registered yet";
+    public static final String LOCKED = "User account locked successfully";
+    public static final String UNLOCKED = "User account unlocked successfully";
 }

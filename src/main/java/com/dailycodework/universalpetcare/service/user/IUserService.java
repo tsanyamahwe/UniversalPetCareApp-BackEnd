@@ -16,6 +16,8 @@ public interface IUserService {
 
     User findById(Long userId);
 
+    User findByEmail(String email);
+
     void delete(Long userId);
 
     List<UserDTO> getAllUsers();
@@ -31,4 +33,8 @@ public interface IUserService {
     Map<String, Map<String, Long>> aggregateUsersByMonthAndType();
 
     Map<String, Map<String, Long>> aggregatesUsersByEnabledStatusAndType();
+
+    void lockUserAccount(Long userId);
+
+    void unLockUserAccount(Long userId);
 }

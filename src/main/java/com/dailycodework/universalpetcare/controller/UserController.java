@@ -135,4 +135,24 @@ public class UserController {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
         }
     }
+
+    @PutMapping(UrlMapping.LOCK_USER_ACCOUNT)
+    public ResponseEntity<APIResponse> lockUserAccount(@PathVariable Long userId){
+        try {
+            userService.lockUserAccount(userId);
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.LOCKED, null));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
+        }
+    }
+
+    @PutMapping(UrlMapping.UNLOCK_USER_ACCOUNT)
+    public ResponseEntity<APIResponse> unLockUserAccount(@PathVariable Long userId){
+        try {
+            userService.unLockUserAccount(userId);
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.UNLOCKED, null));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
+        }
+    }
 }
