@@ -2,6 +2,7 @@ package com.dailycodework.universalpetcare.controller;
 
 import com.dailycodework.universalpetcare.dto.EntityConverter;
 import com.dailycodework.universalpetcare.dto.UserDTO;
+import com.dailycodework.universalpetcare.event.listener.RegistrationCompleteEvent;
 import com.dailycodework.universalpetcare.exception.ResourceNotFoundException;
 import com.dailycodework.universalpetcare.exception.AlreadyExistException;
 import com.dailycodework.universalpetcare.model.User;
@@ -14,6 +15,7 @@ import com.dailycodework.universalpetcare.service.user.UserService;
 import com.dailycodework.universalpetcare.utils.FeedBackMessage;
 import com.dailycodework.universalpetcare.utils.UrlMapping;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,11 +32,13 @@ public class UserController {
     private final UserService userService;
     private final EntityConverter<User, UserDTO> entityConverter;
     private final IChangePasswordService changePasswordService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @PostMapping(UrlMapping.REGISTER_USER)
     public ResponseEntity<APIResponse> register(@RequestBody RegistrationRequest registrationRequest){
         try{
             User theUser = userService.register(registrationRequest);
+            applicationEventPublisher.publishEvent(new RegistrationCompleteEvent(theUser));
             UserDTO registeredUser = entityConverter.mapEntityToDTO(theUser, UserDTO.class);
             return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, registeredUser));
         }catch (AlreadyExistException e){

@@ -34,4 +34,17 @@ public class FeedBackMessage {
     public static final String NO_VETERINARIANS = "No veterinarians registered yet";
     public static final String LOCKED = "User account locked successfully";
     public static final String UNLOCKED = "User account unlocked successfully";
+    public static final String SUCCESS_AUTH = "Authorization is Successful";
+    public static final String AUTH_DISABLED = "Sorry, your account is disabled. Please contact the service desk";
+    public static final String AUTH_FAILED = "Authentication Failed";
+    public static final Object REASON = "Invalid username or password";
+    public static final String INVALID = "INVALID";
+    public static final String VERIFIED = "VERIFIED";
+    public static final String EXPIRED = "EXPIRED";
+    public static final String VALID = "VALID";
+    public static final String INVALID_TOKEN = "Invalid verification token ";
+    public static final String VALIDATION_ERROR = "";
+    public static final String TOKEN_SAVED_SUCCESS = "Token saved successfully";
+    public static final String NEW_TOKEN = "New token has been created: ";
+    public static final String TOKEN_DELETED = "Token deleted successfully";
 }

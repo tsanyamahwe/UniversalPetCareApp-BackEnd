@@ -1,7 +1,7 @@
 package com.dailycodework.universalpetcare.utils;
 
 public class UrlMapping {
-    /*============= Start End User API================*/
+    /*============================Start End User API=====================================*/
     public static final String API = "/api/v1";
     public static final String USERS = API+"/users";
     public static final String REGISTER_USER = "/register";
@@ -16,9 +16,9 @@ public class UrlMapping {
     public static final String AGGREGATE_STATUS = "/accounts/aggregated-by-status";
     public static final String LOCK_USER_ACCOUNT = "/account/{userId}/lock-user-account";
     public static final String UNLOCK_USER_ACCOUNT = "/account/{userId}/unlock-user-account";
-    /*============= End End User API ==================*/
+    /*============================End End User API=========================================*/
 
-    /*============= Start Appointment API =============*/
+    /*============================Start Appointment API====================================*/
     public static final String APPOINTMENTS = API+"/appointments";
     public static final String ALL_APPOINTMENTS = "/all";
     public static final String BOOK_APPOINTMENT = "/book-appointment";
@@ -31,9 +31,9 @@ public class UrlMapping {
     public static final String DECLINE_APPOINTMENT = "/appointment/{id}/decline";
     public static final String COUNT_APPOINTMENTS = "/count/appointments";
     public static final String APPOINTMENT_SUMMARY = "/summary/appointments-summary";
-    /*================ End Appointment API ===============*/
+    /*============================End Appointment API======================================*/
 
-    /*================ Start Pet API =====================*/
+    /*=============================Start Pet API===========================================*/
     public static final String PETS = API+"/pets";
     public static final String SAVE_PETS_FOR_APPOINTMENTS = "/save-pets";
     public static final String GET_PET_BY_ID = "/pet/{id}";
@@ -43,39 +43,53 @@ public class UrlMapping {
     public static final String GET_PET_COLORS = "/get-pet-colors";
     public static final String GET_PET_BREEDS = "/get-pet-breeds";
     public static final String ADD_PET_TO_APPOINTMENT = "/save-pet-for-appointment/{appointmentId}";
-    /*=============== End Pet API =======================*/
+    /*==============================End Pet API=============================================*/
 
-    /*================== Start Photo API ================*/
+    /*============================Start Photo API===========================================*/
     public static final String PHOTOS = API+"/photos";
     public static final String UPLOAD_PHOTO = "/photo/upload";
     public static final String UPDATE_PHOTO = "/photo/{photoId}/update";
     public static final String DELETE_PHOTO = "/photo/{photoId}/user/{userId}/delete";
     public static final String GET_PHOTO_BY_ID = "/photo/{photoId}";
-    /*================= End Photo API =====================*/
+    /*==============================End Photo API==========================================*/
 
-    /*===================== Start Review API ==================*/
+    /*==============================Start Review API=======================================*/
     public static final String REVIEWS = API+"/reviews";
     public static final String SUBMIT_REVIEW = "/submit-review";
     public static final String GET_USER_REVIEWS = "/user/{userId}/reviews";
     public static final String UPDATE_REVIEW = "/review/{reviewId}/update";
     public static final String DELETE_REVIEW = "/review/{reviewId}/delete";
     public static final String GET_AVG_REVIEWS = "/vet/{veterinarianId}/get-average-rating";
-    /*====================== End Review API ===================*/
+    /*=============================End Review API==========================================*/
 
-    /*==================== Start Veterinarians API =================*/
+    /*============================Start Veterinarians API==================================*/
     public static final String VETERINARIANS = API+"/veterinarians";
     public static final String GET_ALL_VETERINARIANS = "/get-all-veterinarians";
     public static final String SEARCH_VETERINARIAN_FOR_APPOINTMENT = "/search-veterinarian";
     public static final String GET_VET_SPECIALIZATIONS = "/get-vet-specializations";
     public static final String VETS_AGGREGATE_BY_SPECIALIZATION = "/aggregate-vets-by-specialization";
-    /*====================== End Veterinarians API ===================*/
+    /*============================End Veterinarians API====================================*/
 
-    /*==================== Start Change Password API ====================*/
-    public static final String CHANGE_PASSWORD = "/user/{userId}/change-password";
-    /*===================== End Change Password API ====================*/
+    /*============================Start Password API=======================================*/
+    public static final String CHANGE_PASSWORD = API+"/user/{userId}/change-password";
+    /*=============================End Password API========================================*/
 
-    /*+=======================Start Patients API==========================*/
+    /*+==============================Start Patients API====================================*/
     public static final String PATIENTS = API+"/patients";
     public static final String GET_ALL_PATIENTS = "/get-all-patients";
-    /*=========================End Patients API============================*/
+    /*===============================End Patients API======================================*/
+
+    /*============================Start Authentication API=================================*/
+    public static final String AUTH = API+"/auth";
+    public static final String LOGIN = "/login";
+    /*=============================End Authentication API===================================*/
+
+    /*============================Start Verification API====================================*/
+    public static final String TOKEN_VERIFICATION = API+"/verification";
+    public static final String VALIDATE_TOKEN = "/validate-token";
+    public static final String GENERATE_NEW_TOKEN = "/generate-new-token";
+    public static final String DELETE_TOKEN = "/delete-token";
+    public static final String CHECK_TOKEN_EXPIRATION = "/check-token-expiration";
+    public static final String SAVE_TOKEN = "/user/save-token";
+    /*============================End Verification API======================================*/
 }
