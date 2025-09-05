@@ -42,7 +42,7 @@ public class AuthController {
         } catch (DisabledException e) {
             return ResponseEntity.status(UNAUTHORIZED).body(new APIResponse(FeedBackMessage.AUTH_DISABLED, null));
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(UNAUTHORIZED).body(new APIResponse(FeedBackMessage.AUTH_FAILED, FeedBackMessage.REASON));
+            return ResponseEntity.status(UNAUTHORIZED).body(new APIResponse(FeedBackMessage.AUTH_FAILED, FeedBackMessage.AUTH_REASON));
         }
     }
 }

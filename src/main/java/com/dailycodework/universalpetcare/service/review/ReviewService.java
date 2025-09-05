@@ -66,7 +66,7 @@ public class ReviewService implements IReviewService{
                     existingReview.setStars(reviewUpdateRequest.getStars());
                     existingReview.setFeedback(reviewUpdateRequest.getFeedback());
                     return reviewRepository.save(existingReview);
-                }).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+                }).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.REVIEWS_NOT_FOUND));
     }
 
     @Override
@@ -77,7 +77,7 @@ public class ReviewService implements IReviewService{
 
     @Override
     public void deleteReview(Long reviewerId) {
-        reviewRepository.findById(reviewerId).ifPresentOrElse(Review::removeRelationship, () -> {throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);});
+        reviewRepository.findById(reviewerId).ifPresentOrElse(Review::removeRelationship, () -> {throw new ResourceNotFoundException(FeedBackMessage.REVIEWS_NOT_FOUND);});
         reviewRepository.deleteById(reviewerId);
     }
 }

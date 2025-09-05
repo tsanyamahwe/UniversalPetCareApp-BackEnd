@@ -69,7 +69,7 @@ public class AppointmentService implements IAppointmentService{
     public Appointment updateAppointment(Long id, AppointmentUpdateRequest appointmentUpdateRequestRequest) {
         Appointment existingAppointment = getAppointmentById(id);
         if(!Objects.equals(existingAppointment.getStatus(), AppointmentStatus.WAITING_FOR_APPROVAL)){
-            throw new IllegalStateException(FeedBackMessage.ALREADY_APPROVED);
+            throw new IllegalStateException(FeedBackMessage.APPOINTMENT_ALREADY_APPROVED);
         }else{
             existingAppointment.setAppointmentDate(appointmentUpdateRequestRequest.getAppointmentDate());
             existingAppointment.setAppointmentTime(appointmentUpdateRequestRequest.getAppointmentTime());
@@ -80,13 +80,6 @@ public class AppointmentService implements IAppointmentService{
 
     @Override
     @Transactional
-//    public void deleteAppointmentById(Long id) {
-//        appointmentRepository.findById(id).ifPresentOrElse(appointment -> {
-//            appointment.getPets().size();
-//            appointmentRepository.delete(appointment);
-//        }, ()->{throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);});
-//    }
-
     public void deleteAppointmentById(Long id) {
         appointmentRepository.findById(id).ifPresentOrElse(appointment -> {
             // Get all pets for this appointment, and delete them
@@ -94,21 +87,16 @@ public class AppointmentService implements IAppointmentService{
             if (!pets.isEmpty()) {
                 petRepository.deleteAll(pets);
             }
-
-            // Clear the relationship
-            appointment.getPets().clear();
-
-            // Delete the appointment
-            appointmentRepository.delete(appointment);
-
+            appointment.getPets().clear();// Clear the relationship
+            appointmentRepository.delete(appointment); // Delete the appointment
         }, () -> {
-            throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);
+            throw new ResourceNotFoundException(FeedBackMessage.APPOINTMENT_NOT_FOUND);
         });
     }
 
     @Override
     public Appointment getAppointmentById(Long id) {
-        return appointmentRepository.findById(id).orElseThrow(()->new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+        return appointmentRepository.findById(id).orElseThrow(()->new ResourceNotFoundException(FeedBackMessage.APPOINTMENT_NOT_FOUND));
     }
 
     @Override
@@ -147,7 +135,7 @@ public class AppointmentService implements IAppointmentService{
     public Appointment declineAppointment(Long appointmentId){
         return appointmentRepository.findById(appointmentId).map(appointment -> {appointment.setStatus(AppointmentStatus.NOT_APPROVED);
                     return appointmentRepository.saveAndFlush(appointment);
-                }).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.RESOURCE_NOT_FOUND));
+                }).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.APPOINTMENT_NOT_FOUND));
     }
 
     @Override

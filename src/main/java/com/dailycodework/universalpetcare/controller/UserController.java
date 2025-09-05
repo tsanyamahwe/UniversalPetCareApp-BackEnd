@@ -40,7 +40,7 @@ public class UserController {
             User theUser = userService.register(registrationRequest);
             applicationEventPublisher.publishEvent(new RegistrationCompleteEvent(theUser));
             UserDTO registeredUser = entityConverter.mapEntityToDTO(theUser, UserDTO.class);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, registeredUser));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.USER_CREATED, registeredUser));
         }catch (AlreadyExistException e){
             return ResponseEntity.status(CONFLICT).body(new APIResponse(e.getMessage(), null));
         } catch (Exception e) {
@@ -53,7 +53,7 @@ public class UserController {
         try{
             User theUser = userService.update(userId, userUpdateRequest);
             UserDTO updatedUser = entityConverter.mapEntityToDTO(theUser, UserDTO.class);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.UPDATE_SUCCESS, updatedUser));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.USER_UPDATED, updatedUser));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }catch (Exception e) {
@@ -65,7 +65,7 @@ public class UserController {
     public ResponseEntity<APIResponse> findById(@PathVariable Long userId){
         try{
             UserDTO userDTO = userService.getUserWithDetails(userId);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, userDTO));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.USER_FOUND, userDTO));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }catch (Exception e) {
@@ -77,7 +77,7 @@ public class UserController {
     public ResponseEntity<APIResponse> deleteById(@PathVariable Long userId){
         try{
             userService.delete(userId);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.DELETE_SUCCESS, null));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.USER_DELETED, null));
         }catch(ResourceNotFoundException e){
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }catch (Exception e) {
@@ -88,14 +88,14 @@ public class UserController {
     @GetMapping(UrlMapping.GET_ALL_USERS)
     public ResponseEntity<APIResponse> getAllUsers(){
         List<UserDTO> theUsers = userService.getAllUsers();
-        return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.RESOURCE_FOUND, theUsers));
+        return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.USERS_FOUND, theUsers));
     }
 
     @PutMapping(UrlMapping.CHANGE_PASSWORD)
     public ResponseEntity<APIResponse> changePassword(@PathVariable Long userId, @RequestBody ChangePasswordRequest changePasswordRequest){
         try{
             changePasswordService.changePassword(userId, changePasswordRequest);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, null));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.USER_PASSWORD_CHANGED, null));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new APIResponse(e.getMessage(), null));
         }catch(ResourceNotFoundException e){
@@ -124,7 +124,7 @@ public class UserController {
     public ResponseEntity<APIResponse> aggregateUsersByMonthAndType(){
         try {
             Map<String, Map<String, Long>> aggregatedUsers = userService.aggregateUsersByMonthAndType();
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, aggregatedUsers));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.USERS_FOUND, aggregatedUsers));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
         }
@@ -134,7 +134,7 @@ public class UserController {
     public ResponseEntity<APIResponse> aggregateUsersByEnabledStatusAndType(){
         try{
             Map<String, Map<String, Long>> aggregatedData = userService.aggregatesUsersByEnabledStatusAndType();
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, aggregatedData));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.USERS_FOUND, aggregatedData));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
         }
@@ -144,7 +144,7 @@ public class UserController {
     public ResponseEntity<APIResponse> lockUserAccount(@PathVariable Long userId){
         try {
             userService.lockUserAccount(userId);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.LOCKED, null));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.USER_LOCKED, null));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
         }
@@ -154,7 +154,7 @@ public class UserController {
     public ResponseEntity<APIResponse> unLockUserAccount(@PathVariable Long userId){
         try {
             userService.unLockUserAccount(userId);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.UNLOCKED, null));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.USER_UNLOCKED, null));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
         }

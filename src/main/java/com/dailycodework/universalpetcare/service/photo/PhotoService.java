@@ -25,7 +25,7 @@ public class PhotoService implements IPhotoService{
 
     @Override
     public Photo savePhoto(MultipartFile file, Long userId) throws IOException, SQLException {
-        User theUser = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND+ userId));
+        User theUser = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.USER_NOT_FOUND+ userId));
         Photo photo = new Photo();
         if(file != null && !file.isEmpty()){
             byte[] photoBytes = file.getBytes();
@@ -42,14 +42,14 @@ public class PhotoService implements IPhotoService{
 
     @Override
     public Photo getPhotoById(Long id) {
-        return photoRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+        return photoRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.PHOTO_NOT_FOUND));
     }
 
     @Transactional
     @Override
     public void deletePhoto(Long id, Long userId) {
-        userRepository.findById(userId).ifPresentOrElse(User:: removeUserPhoto, ()->{throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);});
-        photoRepository.findById(id).ifPresentOrElse(photoRepository::delete, () -> {throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);});
+        userRepository.findById(userId).ifPresentOrElse(User:: removeUserPhoto, ()->{throw new ResourceNotFoundException(FeedBackMessage.USER_NOT_FOUND);});
+        photoRepository.findById(id).ifPresentOrElse(photoRepository::delete, () -> {throw new ResourceNotFoundException(FeedBackMessage.PHOTO_NOT_FOUND);});
     }
 
     @Override
@@ -63,7 +63,7 @@ public class PhotoService implements IPhotoService{
             photo.setFileName(file.getOriginalFilename());
             return photoRepository.save(photo);
         }else {
-            throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);
+            throw new ResourceNotFoundException(FeedBackMessage.PHOTO_NOT_FOUND);
         }
     }
 

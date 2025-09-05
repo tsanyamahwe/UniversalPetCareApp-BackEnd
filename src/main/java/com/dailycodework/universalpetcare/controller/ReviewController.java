@@ -29,7 +29,7 @@ public class ReviewController {
     public ResponseEntity<APIResponse> saveReview(@RequestBody Review review, @RequestParam Long reviewerId,@RequestParam Long veterinarianId){
         try {
             Review savedReviewed = reviewService.saveReview(review, reviewerId, veterinarianId);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, savedReviewed));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.REVIEW_CREATED, savedReviewed));
         } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.status(NOT_ACCEPTABLE).body(new APIResponse(e.getMessage(), null));
         }catch (AlreadyExistException e){
@@ -46,9 +46,9 @@ public class ReviewController {
         try{
             Page<Review> reviewPage = reviewService.findAllReviewsByUserId(userId,page, pageSize);
             Page<ReviewDTO> reviewDTO = reviewPage.map((element) -> modelMapper.map(element, ReviewDTO.class));
-            return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.RESOURCE_FOUND, reviewDTO));
+            return ResponseEntity.status(FOUND).body(new APIResponse(FeedBackMessage.REVIEWS_FOUND, reviewDTO));
         }catch(ResourceNotFoundException e){
-            return ResponseEntity.status(NOT_FOUND).body(new APIResponse(FeedBackMessage.NOT_FOUND, null));
+            return ResponseEntity.status(NOT_FOUND).body(new APIResponse(FeedBackMessage.REVIEWS_NOT_FOUND, null));
         }catch (Exception e){
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
         }
@@ -58,9 +58,9 @@ public class ReviewController {
     public ResponseEntity<APIResponse> updateReview(@PathVariable Long reviewId, @RequestBody ReviewUpdateRequest reviewUpdateRequest){
         try{
             Review updatedReview = reviewService.updateReview(reviewId, reviewUpdateRequest);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.UPDATE_SUCCESS, updatedReview));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.REVIEW_UPDATED, updatedReview));
         }catch(ResourceNotFoundException e){
-            return ResponseEntity.status(NOT_FOUND).body(new APIResponse(FeedBackMessage.NOT_FOUND, null));
+            return ResponseEntity.status(NOT_FOUND).body(new APIResponse(FeedBackMessage.REVIEWS_NOT_FOUND, null));
         }catch (Exception e){
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
         }
@@ -70,7 +70,7 @@ public class ReviewController {
     public ResponseEntity<APIResponse> deleteReview(@PathVariable Long reviewId){
         try {
             reviewService.deleteReview(reviewId);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.DELETE_SUCCESS, null));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.REVIEW_DELETED, null));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }catch (Exception e){
@@ -82,7 +82,7 @@ public class ReviewController {
     public ResponseEntity<APIResponse> getAverageRatingForVet(@PathVariable Long veterinarianId){
         try {
             double averageRating = reviewService.getAverageRatingForVet(veterinarianId);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, averageRating));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.REVIEWS_FOUND, averageRating));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
         }

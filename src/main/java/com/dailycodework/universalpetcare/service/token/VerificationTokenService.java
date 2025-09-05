@@ -23,18 +23,18 @@ public class VerificationTokenService implements IVerificationTokenService{
     public String validateToken(String token) {
         Optional<VerificationToken> verificationToken = findByToken(token);
         if(verificationToken.isEmpty()){
-            return FeedBackMessage.INVALID;
+            return FeedBackMessage.VERIFICATION_TOKEN_INVALID;
         }
         User user = verificationToken.get().getUser();
         if(user.isEnabled()){
-            return FeedBackMessage.VERIFIED;
+            return FeedBackMessage.VERIFICATION_TOKEN_VERIFIED;
         }
         if(isTokenExpired(token)){
-            return FeedBackMessage.EXPIRED;
+            return FeedBackMessage.VERIFICATION_TOKEN_EXPIRED;
         }
         user.setEnabled(true);
         userRepository.save(user);
-        return FeedBackMessage.VALID;
+        return FeedBackMessage.VERIFICATION_TOKEN_VALID;
     }
 
     @Override

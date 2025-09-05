@@ -30,7 +30,7 @@ public class VeterinarianController {
     @GetMapping(UrlMapping.GET_ALL_VETERINARIANS)
     public ResponseEntity<APIResponse> getAllVeterinarians(){
         List<UserDTO> allVeterinarians = veterinarianService.getAllVeterinariansWithDetails();
-        return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, allVeterinarians));
+        return ResponseEntity.ok(new APIResponse(FeedBackMessage.VETERINARIANS_FOUND, allVeterinarians));
     }
 
     @GetMapping(UrlMapping.SEARCH_VETERINARIAN_FOR_APPOINTMENT)
@@ -43,7 +43,7 @@ public class VeterinarianController {
             if(availableVeterinarians.isEmpty()){
                 return ResponseEntity.status(NOT_FOUND).body(new APIResponse(FeedBackMessage.NO_VETS_AVAILABLE, null));
             }
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, availableVeterinarians));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.VETERINARIAN_FOUND, availableVeterinarians));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }
@@ -52,7 +52,7 @@ public class VeterinarianController {
     @GetMapping(UrlMapping.GET_VET_SPECIALIZATIONS)
     public ResponseEntity<APIResponse> getAllSpecializations(){
         try {
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, veterinarianService.getVeterinarianSpecializations()));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.VET_SPEC_FOUND, veterinarianService.getVeterinarianSpecializations()));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
 

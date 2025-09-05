@@ -39,7 +39,7 @@ public class PetService implements IPetService{
         if (appointment != null) {
             long petCount = appointment.getPets().size();
             if (petCount <= 1) {
-                throw new IllegalStateException(FeedBackMessage.CAN_NOT_DELETE);
+                throw new IllegalStateException(FeedBackMessage.CANNOT_DELETE_PET);
             }
         }
         petRepository.delete(petToDelete);
@@ -47,7 +47,7 @@ public class PetService implements IPetService{
 
     @Override
     public Pet getPetById(Long id) {
-        return petRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+        return petRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.PET_NOT_FOUND));
     }
 
     @Override
@@ -68,19 +68,19 @@ public class PetService implements IPetService{
     @Override
     public Pet addPetToExistingAppointment(Long appointmentId, Pet pet) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new IllegalArgumentException(FeedBackMessage.NOT_AVAILABLE));
+                .orElseThrow(() -> new IllegalArgumentException(FeedBackMessage.APPOINTMENT_NOT_FOUND));
         validateSinglePet(pet);
         pet.setAppointment(appointment);
         return petRepository.save(pet);
     }
 
     private void validateSinglePet(Pet pet) {
-        if (pet == null) {throw new IllegalArgumentException(FeedBackMessage.CAN_NOT_BE_NULL);}
-        if (pet.getName() == null || pet.getName().trim().isEmpty()) {throw new IllegalArgumentException(FeedBackMessage.NAME_REQUIRED);}
-        if (pet.getType() == null || pet.getType().trim().isEmpty()) {throw new IllegalArgumentException(FeedBackMessage.TYPE_REQUIRED);}
-        if (pet.getBreed() == null || pet.getBreed().trim().isEmpty()) {throw new IllegalArgumentException(FeedBackMessage.BREED_REQUIRED);}
-        if (pet.getColor() == null || pet.getColor().trim().isEmpty()) {throw new IllegalArgumentException(FeedBackMessage.COLOR_REQUIRED);}
-        if (Objects.isNull(pet.getAge()) || pet.getAge() <= 0) {throw new IllegalArgumentException(FeedBackMessage.AGE_REQUIREMENT);}
+        if (pet == null) {throw new IllegalArgumentException(FeedBackMessage.PET_CANNOT_BE_NULL);}
+        if (pet.getName() == null || pet.getName().trim().isEmpty()) {throw new IllegalArgumentException(FeedBackMessage.PET_NAME_REQUIRED);}
+        if (pet.getType() == null || pet.getType().trim().isEmpty()) {throw new IllegalArgumentException(FeedBackMessage.PET_TYPE_REQUIRED);}
+        if (pet.getBreed() == null || pet.getBreed().trim().isEmpty()) {throw new IllegalArgumentException(FeedBackMessage.PET_BREED_REQUIRED );}
+        if (pet.getColor() == null || pet.getColor().trim().isEmpty()) {throw new IllegalArgumentException(FeedBackMessage.PET_COLOR_REQUIRED);}
+        if (Objects.isNull(pet.getAge()) || pet.getAge() <= 0) {throw new IllegalArgumentException(FeedBackMessage.PET_AGE_REQUIREMENT);}
     }
 
 }

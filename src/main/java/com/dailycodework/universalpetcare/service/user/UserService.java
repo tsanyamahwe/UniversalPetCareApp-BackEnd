@@ -64,47 +64,31 @@ public class UserService implements IUserService{
 
     @Override
     public User findById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+        return userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.USER_NOT_FOUND));
     }
 
     @Override
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+        return userRepository.findByEmail(email).orElseThrow(()-> new ResourceNotFoundException(FeedBackMessage.USER_NOT_FOUND));
     }
 
     @Override
     @Transactional
-//    public void delete(Long userId){
-//        userRepository.findById(userId)
-//                .ifPresentOrElse(userToDelete ->{
-//                    List<Review> reviews = new ArrayList<>(reviewRepository.findAllByUserId(userId));
-//                    reviewRepository.deleteAll(reviews);
-//                    List<Appointment> appointments = new ArrayList<>(appointmentRepository.findAllAppointmentsByUserId(userId));
-//                    for(Appointment appointment: appointments) {
-//                        appointmentRepository.delete(appointment);
-//                    }
-//                    userRepository.deleteById(userId);
-//                    }, ()-> {throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);});
-//    }
     public void delete(Long userId){
         userRepository.findById(userId)
                 .ifPresentOrElse(userToDelete -> {
                     //Delete Reviews first
                     List<Review> reviews = new ArrayList<>(reviewRepository.findAllByUserId(userId));
                     reviewRepository.deleteAll(reviews);
-
                     //Delete each appointment by ID
                     List<AppointmentDTO> appointments = appointmentService.getUserAppointments(userId);
                     for (AppointmentDTO appointment : appointments) {
-                        //force loading of pets and clear the relationship
-                        appointmentService.deleteAppointmentById(appointment.getId());
+                        appointmentService.deleteAppointmentById(appointment.getId());//force loading of pets and clear the relationship
                     }
-
-                    //Finally delete the user
-                    userRepository.deleteById(userId);
+                    userRepository.deleteById(userId);//Finally delete the user
                 }, () -> {
-                    throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);
-                });
+                    throw new ResourceNotFoundException(FeedBackMessage.USER_NOT_FOUND);
+        });
     }
 
     @Override

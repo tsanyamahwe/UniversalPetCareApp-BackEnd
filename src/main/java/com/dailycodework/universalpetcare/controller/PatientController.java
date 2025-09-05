@@ -24,6 +24,6 @@ public class PatientController {
     @GetMapping(UrlMapping.GET_ALL_PATIENTS)
     public ResponseEntity<APIResponse> getAllPatients(){
         List<UserDTO> allPatients = patientService.getAllPatientsWithDetails();
-        return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, allPatients));
+        return ResponseEntity.ok(new APIResponse(FeedBackMessage.PATIENTS_FOUND, allPatients));
     }
 }

@@ -24,11 +24,11 @@ public class VerificationTokenController {
     public ResponseEntity<APIResponse> validateToken(String token){
         String result = verificationTokenService.validateToken(token);
         APIResponse response = switch (result){
-            case "INVALID" -> new APIResponse(FeedBackMessage.INVALID, null);
-            case "VERIFIED" -> new APIResponse(FeedBackMessage.VERIFIED, null);
-            case "EXPIRED" -> new APIResponse(FeedBackMessage.EXPIRED, null);
-            case "VALID" -> new APIResponse(FeedBackMessage.VALID, null);
-            default -> new APIResponse(FeedBackMessage.VALIDATION_ERROR, null);
+            case "INVALID" -> new APIResponse(FeedBackMessage.VERIFICATION_TOKEN_INVALID, null);
+            case "VERIFIED" -> new APIResponse(FeedBackMessage.VERIFICATION_TOKEN_VERIFIED, null);
+            case "EXPIRED" -> new APIResponse(FeedBackMessage.VERIFICATION_TOKEN_EXPIRED, null);
+            case "VALID" -> new APIResponse(FeedBackMessage.VERIFICATION_TOKEN_VALID, null);
+            default -> new APIResponse(FeedBackMessage.VERIFICATION_VALIDATION_ERROR, null);
         };
         return ResponseEntity.ok(response);
     }
@@ -38,16 +38,16 @@ public class VerificationTokenController {
         boolean isExpired = verificationTokenService.isTokenExpired(token);
         APIResponse response;
         if(isExpired){
-            response = new APIResponse(FeedBackMessage.EXPIRED, null);
+            response = new APIResponse(FeedBackMessage.VERIFICATION_TOKEN_EXPIRED, null);
         }else{
-            response = new APIResponse(FeedBackMessage.VALID, null);
+            response = new APIResponse(FeedBackMessage.VERIFICATION_TOKEN_VALID, null);
         }
         return ResponseEntity.ok(response);
     }
 
     @PostMapping(UrlMapping.SAVE_TOKEN)
     public ResponseEntity<APIResponse> saveVerificationTokenForUsers(@RequestBody VerificationTokenRequest verificationTokenRequest){
-        User user = userRepository.findById(verificationTokenRequest.getUser().getId()).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+        User user = userRepository.findById(verificationTokenRequest.getUser().getId()).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.TOKEN_NOT_FOUND));
         verificationTokenService.saveVerificationTokenForUser(verificationTokenRequest.getToken(), user);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.TOKEN_SAVED_SUCCESS, null));
     }

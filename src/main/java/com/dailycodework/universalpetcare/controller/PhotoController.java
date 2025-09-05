@@ -32,9 +32,9 @@ public class PhotoController {
     public ResponseEntity<APIResponse> uploadPhoto(@RequestParam("file")MultipartFile file, @RequestParam("userId") Long userId) throws SQLException, IOException {
         try{
             Photo thePhoto = photoService.savePhoto(file, userId);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.CREATE_SUCCESS, null));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.PHOTO_UPLOADED, null));
         }catch (IOException | SQLException e){
-           return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(FeedBackMessage.SERVER_ERROR, null));
+           return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(FeedBackMessage.PHOTO_SERVER_ERROR1, null));
         }catch (Exception e){
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }
@@ -49,48 +49,34 @@ public class PhotoController {
             Photo photo = photoService.getPhotoById(photoId);
             if(photo != null) {
                 Photo updatedPhoto = photoService.updatePhoto(photo.getId(), file);
-                return ResponseEntity.ok(new APIResponse(FeedBackMessage.UPDATE_SUCCESS, updatedPhoto.getId()));
+                return ResponseEntity.ok(new APIResponse(FeedBackMessage.PHOTO_UPDATED, updatedPhoto.getId()));
             }
         }catch (ResourceNotFoundException | IOException e){
-            return ResponseEntity.status(NOT_FOUND).body(new APIResponse(FeedBackMessage.NOT_FOUND, null));
+            return ResponseEntity.status(NOT_FOUND).body(new APIResponse(FeedBackMessage.PHOTO_NOT_FOUND, null));
         }
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(FeedBackMessage.SERVER_ERROR, null));
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(FeedBackMessage.PHOTO_SERVER_ERROR2, null));
     }
 
     @DeleteMapping(UrlMapping.DELETE_PHOTO)
     public ResponseEntity<APIResponse> deletePhoto(@PathVariable Long photoId, @PathVariable Long userId){
         try {
             photoService.deletePhoto(photoId, userId);
-            return ResponseEntity.ok(new APIResponse(FeedBackMessage.DELETE_SUCCESS, null));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.PHOTO_DELETED, null));
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(NOT_FOUND).body(new APIResponse(FeedBackMessage.NOT_FOUND, null));
+            return ResponseEntity.status(NOT_FOUND).body(new APIResponse(FeedBackMessage.PHOTO_NOT_FOUND, null));
         }catch (Exception e){
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(FeedBackMessage.SERVER_ERROR, null));
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(FeedBackMessage.PHOTO_SERVER_ERROR3, null));
         }
     }
 
     @GetMapping(UrlMapping.GET_PHOTO_BY_ID)
-//    public ResponseEntity<APIResponse> getPhotoById(@PathVariable("photoId") Long photoId){
-//        try {
-//            Photo thePhoto = photoService.getPhotoById(photoId);
-//            return ResponseEntity.ok(new APIResponse(FeedBackMessage.RESOURCE_FOUND, thePhoto));
-//        } catch (ResourceNotFoundException e) {
-//            return ResponseEntity.status(NOT_FOUND).body(new APIResponse(FeedBackMessage.NOT_FOUND, null));
-//        }catch (Exception e){
-//            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(FeedBackMessage.SERVER_ERROR, null));
-//        }
-//    }
     public ResponseEntity<Map<String, Object>> getPhotoById(@PathVariable Long photoId) {
         Photo photo = photoRepository.findById(photoId)
-                .orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
-
+                .orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.PHOTO_NOT_FOUND));
         // Manually create response to avoid serialization issues
         Map<String, Object> response = new HashMap<>();
         response.put("id", photo.getId());
         response.put("fileName", photo.getFileName());
-        //response.put("uploadDate", photo.getUploadDate());
-        //response.put("userId", photo.getUser().getId());
-        // DON'T include imageData here
 
         return ResponseEntity.ok(response);
     }
