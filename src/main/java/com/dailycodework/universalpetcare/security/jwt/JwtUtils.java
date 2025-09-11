@@ -9,7 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.List;
 
@@ -21,31 +21,37 @@ public class JwtUtils {
     private int jwtExpirationMs;
 
     public String generateTokenForUser(Authentication authentication){
-        UPCUserDetails userPrincipal = (UPCUserDetails) authentication.getDetails();
+        UPCUserDetails userPrincipal = (UPCUserDetails) authentication.getPrincipal();
         List<String> roles = userPrincipal.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
         return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
+                .subject(userPrincipal.getUsername())  // Updated API
                 .claim("id", userPrincipal.getId())
                 .claim("roles", roles)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime()+jwtExpirationMs))
-                .signWith(key(), SignatureAlgorithm.HS256).compact();
+                .issuedAt(new Date())  // Updated API
+                .expiration(new Date((new Date()).getTime()+jwtExpirationMs))  // Updated API
+                .signWith(key(), Jwts.SIG.HS256)  // Updated SignatureAlgorithm reference
+                .compact();
     }
 
-    private Key key(){
+    private SecretKey key(){
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
     public String getUserNameFromToken(String token){
-        return Jwts.parserBuilder()
-                .setSigningKey(key())
+        return Jwts.parser()  // Updated from parserBuilder()
+                .verifyWith(key())  // Updated from setSigningKey()
                 .build()
-                .parseClaimsJwt(token).getBody().getSubject();
+                .parseSignedClaims(token)  // Updated from parseClaimsJws()
+                .getPayload()  // Updated from getBody()
+                .getSubject();
     }
 
     public boolean validateToken(String token){
         try{
-            Jwts.parserBuilder().setSigningKey(key()).build().parse(token);
+            Jwts.parser()  // Updated from parserBuilder()
+                    .verifyWith(key())  // Updated from setSigningKey()
+                    .build()
+                    .parseSignedClaims(token);  // Updated from parseClaimsJws()
             return true;
         } catch (MalformedJwtException | IllegalArgumentException | UnsupportedJwtException | ExpiredJwtException e) {
             throw new JwtException(e.getMessage());

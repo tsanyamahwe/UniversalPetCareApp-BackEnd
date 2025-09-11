@@ -21,7 +21,7 @@ public class FeedBackMessage {
     public static final String APPOINTMENT_SUMMARY = "Appointment summary retrieved successfully";
     public static final String APPOINTMENT_ERROR_SUMMARY = "Summary on error retrieving appointment details: ";
     public static final String SENDER_RECIPIENT_NOT_FOUND = "No such Appointment - sender or recipient not found";
-    public static final String APPOINTMENT_ALREADY_APPROVED = "Sorry. This appointment can no longer be updated, it is already approved";
+    public static final String OPERATION_NOT_ALLOWED = "Operation not allowed";
     public static final String APPOINTMENT_NOT_FOUND = "The appointment can not be found, it is not available";
     public static final String CANNOT_CANCEL_APPOINTMENT = "Error: you can not cancel the appointment";
     /*=================================================End Appointment API=======================================================*/
@@ -95,7 +95,7 @@ public class FeedBackMessage {
     public static final String VERIFICATION_TOKEN_VERIFIED = "VERIFIED";
     public static final String VERIFICATION_TOKEN_EXPIRED = "EXPIRED";
     public static final String VERIFICATION_TOKEN_VALID = "VALID";
-    public static final String VERIFICATION_VALIDATION_ERROR= "VALID";
+    public static final String VERIFICATION_VALIDATION_ERROR= "Error";
     public static final String TOKEN_NOT_FOUND = "The token was not found";
     public static final String TOKEN_SAVED_SUCCESS = "Token saved successfully";
     public static final String NEW_TOKEN = "New token has been created: ";

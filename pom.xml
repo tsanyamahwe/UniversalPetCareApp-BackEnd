@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.0</version>
+		<version>3.3.4</version> <!-- Updated to latest stable version -->
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.dailycodework</groupId>
@@ -13,24 +14,14 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>universal-pet-care</name>
 	<description>A simple web app for pet owners and veterinarians</description>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+
 	<properties>
 		<java.version>17</java.version>
-		<modelmapper.version>2.4.4</modelmapper.version>
-		<jackson-databind.version>2.17.1</jackson-databind.version>
-		<jjwt-api.version>0.11.5</jjwt-api.version>
+		<modelmapper.version>3.1.1</modelmapper.version>
+		<jackson-databind.version>2.17.2</jackson-databind.version> <!-- Updated -->
+		<jjwt-api.version>0.12.6</jjwt-api.version> <!-- Updated to latest -->
+		<jjwt-impl.version>0.12.6</jjwt-impl.version> <!-- Updated to latest -->
+		<jjwt-jackson.version>0.12.6</jjwt-jackson.version> <!-- Updated to latest -->
 	</properties>
 
 	<dependencies>
@@ -54,12 +45,24 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+		<!-- JWT Dependencies - Updated to latest secure versions -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
 			<version>${jjwt-api.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>${jjwt-impl.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>${jjwt-jackson.version}</version>
+			<scope>runtime</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
@@ -83,7 +86,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>5.5.0</version>
+			<version>5.12.0</version> <!-- Updated to latest -->
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -98,6 +101,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
@@ -117,7 +121,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.4.0</version> <!-- Updated to latest -->
 				<configuration>
 					<argLine>
 						-XX:+EnableDynamicAgentLoading

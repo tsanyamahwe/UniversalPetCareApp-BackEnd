@@ -130,8 +130,8 @@ public class AppointmentController {
             Appointment appointment = appointmentService.declineAppointment(id);
             applicationEventPublisher.publishEvent(new AppointmentDeclinedEvent(appointment));
             return ResponseEntity.ok(new APIResponse(FeedBackMessage.APPOINTMENT_DECLINED , appointment));
-        } catch (ResourceNotFoundException e) {
-            return  ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
+        } catch (IllegalStateException e) {
+            return  ResponseEntity.status(NOT_ACCEPTABLE).body(new APIResponse(e.getMessage(), null));
         }
     }
 

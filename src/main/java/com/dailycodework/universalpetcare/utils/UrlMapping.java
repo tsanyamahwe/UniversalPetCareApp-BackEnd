@@ -82,14 +82,19 @@ public class UrlMapping {
     /*============================Start Authentication API=================================*/
     public static final String AUTH = API+"/auth";
     public static final String LOGIN = "/login";
-    /*=============================End Authentication API===================================*/
-
-    /*============================Start Verification API====================================*/
-    public static final String TOKEN_VERIFICATION = API+"/verification";
+    public static final String TOKEN_VERIFICATION = "/verification";
     public static final String VALIDATE_TOKEN = "/validate-token";
     public static final String GENERATE_NEW_TOKEN = "/generate-new-token";
     public static final String DELETE_TOKEN = "/delete-token";
     public static final String CHECK_TOKEN_EXPIRATION = "/check-token-expiration";
     public static final String SAVE_TOKEN = "/user/save-token";
-    /*============================End Verification API======================================*/
+    public static final String VERIFY_EMAIL = "/verify-your-email";
+    /*============================End Authentication API======================================*/
+
+    /*==================================Start Role API========================================*/
+    public static final String ROLES = API+"/roles";
+    public static final String ALL_ROLES = "/all-roles";
+    public static final String ROLE_BY_ID = "/role/get-role-by-id";
+    public static final String ROLE_BY_NAME = "/get-role-by-name";
+    /*====================================End Role API========================================*/
 }

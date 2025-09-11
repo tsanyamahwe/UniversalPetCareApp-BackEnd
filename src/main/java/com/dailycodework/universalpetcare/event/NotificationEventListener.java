@@ -10,9 +10,12 @@ import com.dailycodework.universalpetcare.model.User;
 import com.dailycodework.universalpetcare.service.token.IVerificationTokenService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
@@ -23,52 +26,38 @@ import java.util.UUID;
 public class NotificationEventListener implements ApplicationListener<ApplicationEvent> {
     private final EmailService emailService;
     private final IVerificationTokenService verificationTokenService;
+    private static final Logger logger = LoggerFactory.getLogger(NotificationEventListener.class);
 
     @Value("${frontend.base.url}")
     private String frontEndBasedUrl;
 
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
-        if (event instanceof RegistrationCompleteEvent) {
-            RegistrationCompleteEvent registrationCompleteEvent = (RegistrationCompleteEvent) event;
-            handleSendRegistrationVerificationEmail(registrationCompleteEvent);
-
-        } else if (event instanceof AppointmentBookedEvent) {
-            AppointmentBookedEvent appointmentBookedEvent = (AppointmentBookedEvent) event;
-            try {
+        try{
+            if (event instanceof RegistrationCompleteEvent registrationCompleteEvent) {
+                handleSendRegistrationVerificationEmail(registrationCompleteEvent);
+            }else if (event instanceof AppointmentBookedEvent appointmentBookedEvent) {
                 handleAppointmentBookedNotification(appointmentBookedEvent);
-            } catch (MessagingException | UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
-            }
-
-        } else if (event instanceof AppointmentApprovedEvent) {
-            AppointmentApprovedEvent appointmentApprovedEvent = (AppointmentApprovedEvent) event;
-            try {
+            }else if (event instanceof AppointmentApprovedEvent appointmentApprovedEvent) {
                 handleAppointmentApprovedNotification(appointmentApprovedEvent);
-            } catch (MessagingException | UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
-            }
-
-        } else if (event instanceof AppointmentDeclinedEvent) {
-            AppointmentDeclinedEvent appointmentDeclinedEvent = (AppointmentDeclinedEvent) event;
-            try {
+            }else if (event instanceof AppointmentDeclinedEvent appointmentDeclinedEvent) {
                 handleAppointmentDeclinedNotification(appointmentDeclinedEvent);
-            } catch (MessagingException | UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
-            }
+                }
+        } catch (Exception e) {
+            logger.error(event.getClass().getSimpleName());
         }
     }
 
     /*==============================Start User registration email verification==============================*/
     private void handleSendRegistrationVerificationEmail(RegistrationCompleteEvent registrationCompleteEvent) {
-        User user = registrationCompleteEvent.getUser();
-        String verificationToken = UUID.randomUUID().toString();//Generate a token for the user
-        verificationTokenService.saveVerificationTokenForUser(verificationToken, user);//Save the token for the user
-        String verificationUrl = frontEndBasedUrl + "/email-verification?token=" + verificationToken;//Build the verification URL
-        try {
+        try{
+            User user = registrationCompleteEvent.getUser();
+            String verificationToken = UUID.randomUUID().toString();//Generate a token for the user
+            verificationTokenService.saveVerificationTokenForUser(verificationToken, user);//Save the token for the user
+            String verificationUrl = frontEndBasedUrl + "/email-verification?token=" + verificationToken;//Build the verification URL
             sendRegistrationVerificationEmail(user, verificationUrl);
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            throw new RuntimeException(e.getMessage());
+        }catch (Exception e){
+            logger.error(registrationCompleteEvent.getUser().getEmail(), e.getMessage(), e);
         }
     }
 

@@ -32,10 +32,9 @@ public class ApplicationSecurityConfig {
     private final UPCUserDetailsService upcUserDetailsService;
     private final JwtAuthEntryPoint jwtAuthEntryPoint;
     private static final List<String> SECURED_URLS = List.of(
-            //"/api/v1/appointments/book-appointment",
-            "/api/v1/reviews/**",
-            "reviews/**");
-
+            "/api/v1/appointments/book-appointment",
+            "/api/v1/reviews/**"
+    );
 
     @Bean
     public AuthTokenFilter authTokenFilter(){
