@@ -14,4 +14,6 @@ public interface VeterinarianRepository extends JpaRepository<Veterinarian, Long
     List<String> getDistinctVetSpecialization();
     @Query("SELECT v.specialization as specialization, COUNT(v) as count FROM Veterinarian v GROUP BY v.specialization")
     List<Object[]> countVeterinariansBySpecialization();
+    @Query("SELECT CASE WHEN COUNT(v) > 0 THEN true ELSE false END FROM Veterinarian v WHERE LOWER(v.specialization) = LOWER(?1)")
+    boolean existsBySpecializationIgnoreCase(String normalizesSpecialization);
 }

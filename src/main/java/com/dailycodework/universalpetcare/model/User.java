@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -50,13 +52,40 @@ public class User {
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
                inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles = new HashSet<>();
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<VerificationToken> verificationTokens = new ArrayList<>();
+    @Column(name = "last_password_change")
+    private LocalDateTime lastPasswordChange;
+    @Column(name = "password_change_count")
+    private Integer passwordChangeCount = 0;
 
     public void removeUserPhoto(){
         if(this.getPhoto() != null){
             this.setPhoto(null);
         }
+    }
+
+    public void updatePasswordChangeInfo() {
+        this.lastPasswordChange = LocalDateTime.now();
+        this.passwordChangeCount = (this.passwordChangeCount == null ? 0 : this.passwordChangeCount) + 1;
+    }
+
+    public boolean canChangePassword(){
+        if(lastPasswordChange == null){
+            return true;
+        }
+        return lastPasswordChange.isBefore(LocalDateTime.now().minusWeeks(2));
+    }
+
+    public long getDaysUntilPasswordChangeAllowed(){
+        if(lastPasswordChange == null){
+            return 0;
+        }
+        LocalDateTime allowedDate = lastPasswordChange.plusWeeks(2);
+        if(allowedDate.isBefore(LocalDateTime.now())){
+            return 0;
+        }
+        return ChronoUnit.DAYS.between(LocalDateTime.now(), allowedDate);
     }
 
     public List<Appointment> getAppointments() {

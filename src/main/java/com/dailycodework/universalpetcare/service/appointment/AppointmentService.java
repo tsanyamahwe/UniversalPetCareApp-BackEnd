@@ -20,8 +20,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.dailycodework.universalpetcare.enums.AppointmentStatus.UP_COMING;
 
 @Service
 @RequiredArgsConstructor
@@ -168,5 +173,52 @@ public class AppointmentService implements IAppointmentService{
                 .filter(entry -> entry.getValue() > 0)
                 .map(entry -> createStatusSummaryMap(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Long> getAppointmentIds(){
+        List<Appointment> appointments = appointmentRepository.findAll();
+        return appointments.stream()
+                .map(Appointment::getId)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void setAppointmentStatus(Long appointmentId){
+        Appointment appointment = getAppointmentById(appointmentId);
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        LocalTime appointmentEndTime = appointment.getAppointmentTime().plusMinutes(2).truncatedTo(ChronoUnit.MINUTES);
+        switch (appointment.getStatus()){
+            case APPROVED -> {
+                if (currentDate.isBefore(appointment.getAppointmentDate()) ||
+                        (currentDate.equals(appointment.getAppointmentDate()) && currentTime.isBefore(appointment.getAppointmentTime()))){
+                    appointment.setStatus(UP_COMING);
+                }
+                break;
+            }
+            case UP_COMING -> {
+                if(currentDate.equals(appointment.getAppointmentDate()) &&
+                        currentTime.isAfter(appointment.getAppointmentTime()) && !currentTime.isAfter(appointmentEndTime)){
+                    appointment.setStatus(AppointmentStatus.ON_GOING);
+                }
+                break;
+            }
+            case ON_GOING -> {
+                if (currentDate.isAfter(appointment.getAppointmentDate()) ||
+                        (currentDate.equals(appointment.getAppointmentDate()) && currentTime.isAfter(appointmentEndTime))){
+                    appointment.setStatus(AppointmentStatus.COMPLETED);
+                }
+                break;
+            }
+            case WAITING_FOR_APPROVAL -> {
+                if (currentDate.isAfter(appointment.getAppointmentDate()) ||
+                        (currentDate.equals(appointment.getAppointmentDate()) && !currentTime.isBefore(appointment.getAppointmentTime()))){
+                    appointment.setStatus(AppointmentStatus.NOT_APPROVED);
+                }
+                break;
+            }
+        }
+        appointmentRepository.save(appointment);
     }
 }

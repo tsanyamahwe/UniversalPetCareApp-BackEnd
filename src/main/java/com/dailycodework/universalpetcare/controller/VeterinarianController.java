@@ -8,6 +8,7 @@ import com.dailycodework.universalpetcare.service.veterinarian.IVeterinarianServ
 import com.dailycodework.universalpetcare.utils.FeedBackMessage;
 import com.dailycodework.universalpetcare.utils.UrlMapping;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,5 +64,19 @@ public class VeterinarianController {
     public ResponseEntity<List<Map<String, Object>>> aggregateVeterinariansBySpecialization(){
             List<Map<String, Object>> aggregatedVeterinarians = veterinarianService.aggregateVeterinariansBySpecialization();
             return ResponseEntity.ok(aggregatedVeterinarians);
+    }
+
+    @PutMapping(UrlMapping.SAVE_SPECIALIZATION)
+    public ResponseEntity<String> addVeterinarianSpecialization(@PathVariable Long veterinarianId, @RequestBody String specialization){
+        try{
+            String result = veterinarianService.addVeterinarianSpecialization(veterinarianId, specialization);
+            return ResponseEntity.ok(result);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }catch(ResourceNotFoundException e){
+            return ResponseEntity.status(NOT_FOUND).body(e.getMessage());
+        }catch (Exception e){
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(FeedBackMessage.VET_SPEC_ERROR + e.getMessage());
+        }
     }
 }

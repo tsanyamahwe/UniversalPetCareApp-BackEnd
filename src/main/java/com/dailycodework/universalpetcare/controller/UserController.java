@@ -1,10 +1,12 @@
 package com.dailycodework.universalpetcare.controller;
 
 import com.dailycodework.universalpetcare.dto.EntityConverter;
+import com.dailycodework.universalpetcare.dto.PasswordChangeInfoDTO;
 import com.dailycodework.universalpetcare.dto.UserDTO;
 import com.dailycodework.universalpetcare.event.listener.RegistrationCompleteEvent;
 import com.dailycodework.universalpetcare.exception.ResourceNotFoundException;
 import com.dailycodework.universalpetcare.exception.AlreadyExistException;
+import com.dailycodework.universalpetcare.exception.PasswordChangeNotAllowedException;
 import com.dailycodework.universalpetcare.model.User;
 import com.dailycodework.universalpetcare.request.ChangePasswordRequest;
 import com.dailycodework.universalpetcare.request.RegistrationRequest;
@@ -16,9 +18,11 @@ import com.dailycodework.universalpetcare.utils.FeedBackMessage;
 import com.dailycodework.universalpetcare.utils.UrlMapping;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -96,12 +100,40 @@ public class UserController {
         try{
             changePasswordService.changePassword(userId, changePasswordRequest);
             return ResponseEntity.ok(new APIResponse(FeedBackMessage.USER_PASSWORD_CHANGED, null));
-        } catch (IllegalArgumentException e) {
+        }catch(PasswordChangeNotAllowedException e) {
+            return ResponseEntity.status(TOO_EARLY).body(new APIResponse(e.getMessage(), null));
+        }catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new APIResponse(e.getMessage(), null));
         }catch(ResourceNotFoundException e){
             return  ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping(UrlMapping.INFO_CHANGE_PASS)
+    public ResponseEntity<APIResponse> getPasswordChangeInfo(@PathVariable Long userId){ // FIXED return type
+        try{
+            PasswordChangeInfoDTO info = userService.getPasswordChangeInfo(userId);
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.PASS_INFO, info));
+        }catch (ResourceNotFoundException e){
+            return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping(UrlMapping.CAN_CHANGE_PASS)
+    public ResponseEntity<Map<String, Object>> canChangePassword(@PathVariable Long userId){ // FIXED missing parameter
+        try{
+            boolean canChange = userService.canUserChangePassword(userId);
+            long daysRemaining = userService.getDaysUntilPasswordChangeAllowed(userId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("canChange", canChange);
+            response.put("daysRemaining", daysRemaining);
+
+            return ResponseEntity.ok(response); // FIXED
+        }catch (ResourceNotFoundException e){
+            return ResponseEntity.status(NOT_FOUND).build();
         }
     }
 

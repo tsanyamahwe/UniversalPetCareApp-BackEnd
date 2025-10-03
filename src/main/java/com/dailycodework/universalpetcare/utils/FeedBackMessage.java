@@ -39,7 +39,7 @@ public class FeedBackMessage {
 
     /*==================================================Start Pet API============================================================*/
     public static final String PET_FOUND = "The pet was found";
-    public static final String PETS_ADDED = " And pet(s) were added to the appointment successfully";
+    public static final String PETS_ADDED = " And pet(s) were successfully added to the appointment";
     public static final String PET_DELETED = "The pet was deleted successfully";
     public static final String PET_UPDATED = "The pet(s) was updated successfully";
     public static final String PETS_FOUND_TYPES = "The pets were found by their types";
@@ -79,8 +79,8 @@ public class FeedBackMessage {
     /*===================================================End Review API===========================================================*/
 
     /*==================================================Start User API============================================================*/
-    public static final String USER_CREATED = "The user was registered successfully";
-    public static final String USER_UPDATED = "The user entity updated successfully";
+    public static final String USER_CREATED = "The user was registered successfully. Go and verify this registration from your email address";
+    public static final String USER_UPDATED = "The user entity was updated successfully";
     public static final String USER_FOUND = "The user entity was found";
     public static final String USERS_FOUND = "The users were found";
     public static final String USER_DELETED = "The user entity was deleted successfully";
@@ -88,6 +88,7 @@ public class FeedBackMessage {
     public static final String USER_LOCKED = "User account locked successfully";
     public static final String USER_UNLOCKED = "User account unlocked successfully";
     public static final String USER_NOT_FOUND = "The user entity was not found:";
+    public static final String PASS_INFO = "Change password information";
     /*===================================================End User API=============================================================*/
 
     /*==========================================Start Verification Token API======================================================*/
@@ -101,6 +102,13 @@ public class FeedBackMessage {
     public static final String NEW_TOKEN = "New token has been created: ";
     public static final String TOKEN_DELETED = "Token deleted successfully";
     public static final String INVALID_TOKEN = "Invalid verification token ";
+    public static final String VERIFICATION_NOTICE = "Please enter the email associated with your account";
+    public static final String PASSWORD_RESET = "Your password has been reset";
+    public static final String VERIFICATION_UPDATE = "A link was sent to your email, please check to complete your password reset request";
+    public static final String MISSING_AUTH = "Missing token or password";
+    public static final String PASSWORD_REUSE_FORBIDDEN = "You can not repeat the same old password, choose another one!";
+    public static final String INVALID_PASSWORD_FORMAT = "Your password should have at least 8 characters, 1 capital letter, 1 number, and 1 special character";
+    public static final String NEW_VERIF_TOKEN_SEND = "The new verification token has been send to your email";
     /*===========================================End Verification Token API=======================================================*/
 
     /*================================================Start Veterinarian API==========================================================*/
@@ -108,8 +116,16 @@ public class FeedBackMessage {
     public static final String VETERINARIAN_FOUND = "Veterinarian found successfully";
     public static final String NO_VETS_AVAILABLE = "Sorry! Veterinarians of such specialization category are not available for the requested date and time";
     public static final String VET_SPEC_FOUND = "The veterinarian specializations found";
+    public static final String SPECIALIZATION_ALREADY_EXISTS = "Specialization already exists";
+    public static final String SPECIALIZATION_REQUIRED = "Specialization cannot be null or empty";
+    public static final String VET_ID_REQUIRED = "Veterinarian ID cannot be null";
+    public static final String VET_NOT_FOUND = "Veterinarian not found with id: ";
+    public static final String VET_SPEC_ERROR = "Error updating specialization: ";
     /*==================================================End Veterinarian API==========================================================*/
 
     public static final String NOT_FOUND = "Resource not found";
     public static final String RESOURCE_NOT_FOUND = "This resource is not available";
+
+
+
 }

@@ -1,5 +1,6 @@
 package com.dailycodework.universalpetcare.service.token;
 
+import com.dailycodework.universalpetcare.exception.ResourceNotFoundException;
 import com.dailycodework.universalpetcare.model.User;
 import com.dailycodework.universalpetcare.model.VerificationToken;
 import com.dailycodework.universalpetcare.repository.UserRepository;
@@ -50,10 +51,10 @@ public class VerificationTokenService implements IVerificationTokenService{
             var verificationToken = token.get();
             verificationToken.setToken(UUID.randomUUID().toString());
             verificationToken.setExpirationDate(SystemUtils.getExpirationTime());
-            verificationTokenRepository.save(verificationToken);
-            return verificationToken;
+            return verificationTokenRepository.save(verificationToken);
+        }else {
+            throw new IllegalArgumentException(FeedBackMessage.INVALID_TOKEN + oldToken);
         }
-        throw new IllegalArgumentException(FeedBackMessage.INVALID_TOKEN + oldToken);
     }
 
     @Override
@@ -74,5 +75,17 @@ public class VerificationTokenService implements IVerificationTokenService{
         }
         VerificationToken verifyToken = verificationToken.get();
         return verifyToken.getExpirationDate().getTime() <= Calendar.getInstance().getTime().getTime();
+    }
+
+    @Override
+    public boolean canUserResetPassword(String email){
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.USER_NOT_FOUND));
+        return user.canChangePassword();
+    }
+
+    @Override
+    public Long getDaysUntilPasswordResetAllowed(String email){
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.USER_NOT_FOUND));
+        return user.getDaysUntilPasswordChangeAllowed();
     }
 }

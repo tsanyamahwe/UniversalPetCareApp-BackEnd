@@ -12,4 +12,6 @@ public interface IVerificationTokenService {
     Optional<VerificationToken> findByToken(String token);
     void deleteVerificationToken(Long tokenId);
     boolean isTokenExpired(String token);
+    boolean canUserResetPassword(String email);
+    Long getDaysUntilPasswordResetAllowed(String email);
 }

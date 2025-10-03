@@ -22,4 +22,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void updateUserEnabledStatus(@Param("userId") Long userId, @Param("enabled") boolean enabled);
     List<Patient> findAllPatientsByUserType(String patient);
     Optional<User> findByEmail(String email);
+
 }

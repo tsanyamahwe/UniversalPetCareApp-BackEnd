@@ -1,13 +1,13 @@
 package com.dailycodework.universalpetcare.service.user;
 
-import com.dailycodework.universalpetcare.dto.AppointmentDTO;
-import com.dailycodework.universalpetcare.dto.EntityConverter;
-import com.dailycodework.universalpetcare.dto.ReviewDTO;
-import com.dailycodework.universalpetcare.dto.UserDTO;
+import com.dailycodework.universalpetcare.dto.*;
 import com.dailycodework.universalpetcare.exception.ResourceNotFoundException;
 import com.dailycodework.universalpetcare.factory.UserFactory;
 import com.dailycodework.universalpetcare.model.Review;
 import com.dailycodework.universalpetcare.model.User;
+import com.dailycodework.universalpetcare.request.ChangePasswordRequest;
+import com.dailycodework.universalpetcare.service.password.ChangePasswordService;
+import com.dailycodework.universalpetcare.utils.PasswordValidator;
 import com.dailycodework.universalpetcare.repository.AppointmentRepository;
 import com.dailycodework.universalpetcare.repository.ReviewRepository;
 import com.dailycodework.universalpetcare.repository.UserRepository;
@@ -45,10 +45,51 @@ public class UserService implements IUserService{
     private final ReviewService reviewService;
     private final ReviewRepository reviewRepository;
     private final AppointmentRepository appointmentRepository;
+    private final PasswordValidator passwordValidator;
+    private final ChangePasswordService changePasswordService;
 
     @Override
     public User register(RegistrationRequest registrationRequest){
-        return userFactory.createUser(registrationRequest);
+        PasswordValidator.ValidationResult validationResult = passwordValidator.validatePassword(registrationRequest.getPassword());
+        if(!validationResult.isValid()){
+            throw new IllegalArgumentException(validationResult.getMessage());
+        }
+        User user = userFactory.createUser(registrationRequest);
+        user.updatePasswordChangeInfo();
+        return userRepository.save(user);
+    }
+
+    @Override
+    public void changeUserPassword(Long userId, String currentPassword, String newPassword, String confirmNewPassword){
+        ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
+        changePasswordRequest.setCurrentPassword(currentPassword);
+        changePasswordRequest.setNewPassword(newPassword);
+        changePasswordRequest.setConfirmNewPassword(confirmNewPassword);
+
+        changePasswordService.changePassword(userId, changePasswordRequest);
+    }
+
+    @Override
+    public boolean canUserChangePassword(Long userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.USER_NOT_FOUND));
+        return user.canChangePassword();
+    }
+
+    @Override
+    public long getDaysUntilPasswordChangeAllowed(Long userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.USER_NOT_FOUND));
+        return user.getDaysUntilPasswordChangeAllowed();
+    }
+
+    @Override
+    public PasswordChangeInfoDTO getPasswordChangeInfo(Long userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.USER_NOT_FOUND));
+        return PasswordChangeInfoDTO.builder()
+                .canChangePassword(user.canChangePassword())
+                .daysUntilAllowed(user.getDaysUntilPasswordChangeAllowed())
+                .lastPasswordChange(user.getLastPasswordChange())
+                .passwordChangeCount(user.getPasswordChangeCount())
+                .build();
     }
 
     @Override

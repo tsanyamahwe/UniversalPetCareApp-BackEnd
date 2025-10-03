@@ -54,10 +54,10 @@ public class DefaultDataInitializer implements ApplicationListener<ApplicationRe
             veterinarian.setPassword(passwordEncoder.encode("password"+i));
             veterinarian.setUserType("VET");
             veterinarian.setSpecialization("Dermatologist");
+            veterinarian.setEnabled(true);
             veterinarian.setRoles(new HashSet<>(Collections.singletonList(veterinarianRole)));
 
             Veterinarian theVeterinarian = veterinarianRepository.save(veterinarian);
-            theVeterinarian.setEnabled(true);
             System.out.println("Default veterinarian user "+i+" created successfully");
         }
     }
@@ -78,10 +78,10 @@ public class DefaultDataInitializer implements ApplicationListener<ApplicationRe
             patient.setEmail(defaultEmail);
             patient.setPassword(passwordEncoder.encode("password"+i));
             patient.setUserType("PATIENT");
+            patient.setEnabled(true);
             patient.setRoles(new HashSet<>(Collections.singletonList(patientRole)));
 
             Patient thePatient = patientRepository.save(patient);
-            thePatient.setEnabled(true);
             System.out.println("Default veterinarian user " + i + " created successfully");
         }
     }
@@ -101,10 +101,10 @@ public class DefaultDataInitializer implements ApplicationListener<ApplicationRe
         admin.setEmail(defaultAdminEmail);
         admin.setPassword(passwordEncoder.encode("Sanyas84$!@#$"));
         admin.setUserType("ADMIN");
+        admin.setEnabled(true);
         admin.setRoles(new HashSet<>(Collections.singletonList(adminRole)));
 
         Admin theAdmin = adminRepository.save(admin);
-        theAdmin.setEnabled(true);
         System.out.println("Default admin user created successfully");
     }
 

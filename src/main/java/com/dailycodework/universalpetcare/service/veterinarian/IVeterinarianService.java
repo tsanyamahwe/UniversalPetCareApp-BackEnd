@@ -15,6 +15,8 @@ public interface IVeterinarianService {
 
     List<Veterinarian> getVeterinarianBySpecialization(String specialization);
 
+    String addVeterinarianSpecialization(Long veterinarianId, String specialization);
+
     List<String> getVeterinarianSpecializations();
 
     List<Map<String, Object>> aggregateVeterinariansBySpecialization();

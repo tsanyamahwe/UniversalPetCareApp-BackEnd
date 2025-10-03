@@ -16,6 +16,9 @@ public class UrlMapping {
     public static final String AGGREGATE_STATUS = "/accounts/aggregated-by-status";
     public static final String LOCK_USER_ACCOUNT = "/account/{userId}/lock-user-account";
     public static final String UNLOCK_USER_ACCOUNT = "/account/{userId}/unlock-user-account";
+    public static final String CHANGE_PASSWORD = "/user/{userId}/change-password";
+    public static final String INFO_CHANGE_PASS = "/password-change-info/{userId}";
+    public static final String CAN_CHANGE_PASS = "/can-change-password/{userId}";
     /*============================End End User API=========================================*/
 
     /*============================Start Appointment API====================================*/
@@ -68,11 +71,8 @@ public class UrlMapping {
     public static final String SEARCH_VETERINARIAN_FOR_APPOINTMENT = "/search-veterinarian";
     public static final String GET_VET_SPECIALIZATIONS = "/get-vet-specializations";
     public static final String VETS_AGGREGATE_BY_SPECIALIZATION = "/aggregate-vets-by-specialization";
+    public static final String SAVE_SPECIALIZATION = "/{veterinarianId}/specialization";
     /*============================End Veterinarians API====================================*/
-
-    /*============================Start Password API=======================================*/
-    public static final String CHANGE_PASSWORD = API+"/user/{userId}/change-password";
-    /*=============================End Password API========================================*/
 
     /*+==============================Start Patients API====================================*/
     public static final String PATIENTS = API+"/patients";
@@ -82,13 +82,13 @@ public class UrlMapping {
     /*============================Start Authentication API=================================*/
     public static final String AUTH = API+"/auth";
     public static final String LOGIN = "/login";
-    public static final String TOKEN_VERIFICATION = "/verification";
-    public static final String VALIDATE_TOKEN = "/validate-token";
-    public static final String GENERATE_NEW_TOKEN = "/generate-new-token";
-    public static final String DELETE_TOKEN = "/delete-token";
-    public static final String CHECK_TOKEN_EXPIRATION = "/check-token-expiration";
-    public static final String SAVE_TOKEN = "/user/save-token";
     public static final String VERIFY_EMAIL = "/verify-your-email";
+    public static final String RESET_PASSWORD = "/reset-password";
+    public static final String REQUEST_PASS_RESET = "/request-password-reset";
+    public static final String RESEND_TOKEN = "/resend-verification-token";
+    public static final String CAN_RESET_PASS = "/can-reset-password";
+    public static final String RESET_BY_TOKEN = "/can-reset-password-by-token";
+    public static final String RESETTING_PASS = "/advanced/reset-password";
     /*============================End Authentication API======================================*/
 
     /*==================================Start Role API========================================*/
@@ -97,4 +97,13 @@ public class UrlMapping {
     public static final String ROLE_BY_ID = "/role/get-role-by-id";
     public static final String ROLE_BY_NAME = "/get-role-by-name";
     /*====================================End Role API========================================*/
+
+    /*============================Start Verification API=================================*/
+    public static final String TOKEN_VERIFICATION = API+"/verification";
+    public static final String VALIDATE_TOKEN = "/validate-token";
+    public static final String CHECK_TOKEN_EXPIRATION = "/check-token-expiration";
+    public static final String SAVE_TOKEN = "/user/save-token";
+    public static final String GENERATE_NEW_TOKEN = "/generate-new-token";
+    public static final String DELETE_TOKEN = "/delete-token";
+    /*============================End Authentication API=================================*/
 }

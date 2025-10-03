@@ -1,10 +1,7 @@
 package com.dailycodework.universalpetcare.event;
 
 import com.dailycodework.universalpetcare.email.EmailService;
-import com.dailycodework.universalpetcare.event.listener.AppointmentApprovedEvent;
-import com.dailycodework.universalpetcare.event.listener.AppointmentBookedEvent;
-import com.dailycodework.universalpetcare.event.listener.AppointmentDeclinedEvent;
-import com.dailycodework.universalpetcare.event.listener.RegistrationCompleteEvent;
+import com.dailycodework.universalpetcare.event.listener.*;
 import com.dailycodework.universalpetcare.model.Appointment;
 import com.dailycodework.universalpetcare.model.User;
 import com.dailycodework.universalpetcare.service.token.IVerificationTokenService;
@@ -42,7 +39,9 @@ public class NotificationEventListener implements ApplicationListener<Applicatio
                 handleAppointmentApprovedNotification(appointmentApprovedEvent);
             }else if (event instanceof AppointmentDeclinedEvent appointmentDeclinedEvent) {
                 handleAppointmentDeclinedNotification(appointmentDeclinedEvent);
-                }
+            } else if (event instanceof PasswordResetEvent passwordResetEvent) {
+            handlePasswordResetRequest(passwordResetEvent);
+            }
         } catch (Exception e) {
             logger.error(event.getClass().getSimpleName());
         }
@@ -127,4 +126,29 @@ public class NotificationEventListener implements ApplicationListener<Applicatio
         emailService.sendEmail(user.getEmail(), senderName, subject, mailContent);
     }
     /*===============================End Decline Appointment notifications==================================*/
+
+    /*=================================Start Password Reset notifications====================================*/
+    private void handlePasswordResetRequest(PasswordResetEvent passwordResetEvent){
+        User user = passwordResetEvent.getUser();
+        String token = passwordResetEvent.getToken();//UUID.randomUUID().toString();
+        //verificationTokenService.saveVerificationTokenForUser(token, user);
+        String resetUrl = frontEndBasedUrl + "/reset-password?token=" + token;
+        try {
+            sendPasswordResetEmail(user, resetUrl);
+        }catch (MessagingException | UnsupportedEncodingException e){
+            throw  new RuntimeException("Failed to send password reset email", e);
+        }
+    }
+
+    private void sendPasswordResetEmail(User user, String resetUrl) throws MessagingException, UnsupportedEncodingException{
+        String subject = "Password Reset Request";
+        String senderName = "Universal Pet Care";
+        String mailContent ="<p>Hi, " + user.getFirstName() + ",</p>" +
+                "<p>You have requested to reset your password. Please click the link below to proceed:</p>"+
+                "<a href=\"" + resetUrl + "\">Reset Password</a><br>" +
+                "<p>If you did not request this, please ignore this email.</p>" +
+                "<p>Best Regards.<br> Universal Pet Care</p>";
+        emailService.sendEmail(user.getEmail(), senderName, subject, mailContent);
+    }
+    /*==================================End Password Reset notifications=====================================*/
 }

@@ -1,15 +1,27 @@
 package com.dailycodework.universalpetcare.controller;
 
+import com.dailycodework.universalpetcare.event.listener.RegistrationCompleteEvent;
+import com.dailycodework.universalpetcare.exception.PasswordChangeNotAllowedException;
+import com.dailycodework.universalpetcare.exception.ResourceNotFoundException;
+import com.dailycodework.universalpetcare.model.PasswordReset;
+import com.dailycodework.universalpetcare.model.User;
+import com.dailycodework.universalpetcare.model.VerificationToken;
+import com.dailycodework.universalpetcare.repository.UserRepository;
+import com.dailycodework.universalpetcare.request.ChangePasswordRequest;
 import com.dailycodework.universalpetcare.request.LoginRequest;
+import com.dailycodework.universalpetcare.request.PasswordResetRequest;
 import com.dailycodework.universalpetcare.response.APIResponse;
 import com.dailycodework.universalpetcare.response.JwtResponse;
 import com.dailycodework.universalpetcare.security.jwt.JwtUtils;
 import com.dailycodework.universalpetcare.security.user.UPCUserDetails;
+import com.dailycodework.universalpetcare.service.password.ChangePasswordService;
+import com.dailycodework.universalpetcare.service.password.IPasswordResetService;
 import com.dailycodework.universalpetcare.service.token.VerificationTokenService;
 import com.dailycodework.universalpetcare.utils.FeedBackMessage;
 import com.dailycodework.universalpetcare.utils.UrlMapping;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,8 +32,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.http.HttpStatus.GONE;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.springframework.http.HttpStatus.*;
 
 @CrossOrigin("http://localhost:5173")
 @RequiredArgsConstructor
@@ -31,6 +45,10 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final VerificationTokenService verificationTokenService;
+    private final IPasswordResetService passwordResetService;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ChangePasswordService changePasswordService;
+    private final UserRepository userRepository;
 
     @PostMapping(UrlMapping.LOGIN)
     public ResponseEntity<APIResponse> login(@Valid @RequestBody LoginRequest loginRequest){
@@ -58,5 +76,148 @@ public class AuthController {
             case "INVALID" -> ResponseEntity.status(GONE).body(new APIResponse(FeedBackMessage.VERIFICATION_TOKEN_INVALID, null));
             default -> ResponseEntity.internalServerError().body(new APIResponse(FeedBackMessage.VERIFICATION_VALIDATION_ERROR, null));
         };
+    }
+
+    @PutMapping(UrlMapping.RESEND_TOKEN)
+    public ResponseEntity<APIResponse> resendVerificationToken(@RequestParam("token") String oldToken){
+        try{
+            VerificationToken verificationToken = verificationTokenService.generateNewVerificationToken(oldToken);
+            User theUser = verificationToken.getUser();
+            applicationEventPublisher.publishEvent(new RegistrationCompleteEvent(theUser));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.NEW_VERIF_TOKEN_SEND, null));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new APIResponse(e.getMessage(), null));
+        }
+    }
+
+    @PostMapping(UrlMapping.REQUEST_PASS_RESET)
+    public ResponseEntity<APIResponse> requestPasswordReset(@RequestBody Map<String, String> requestBody){
+        String email = requestBody.get("email");
+        if(email == null || email.trim().isEmpty()){
+            return ResponseEntity.badRequest().body(new APIResponse(FeedBackMessage.VERIFICATION_NOTICE, null));
+        }
+        try {
+            //check if user can reset password before sending email
+            if(!verificationTokenService.canUserResetPassword(email)){
+                long daysRemaining = verificationTokenService.getDaysUntilPasswordResetAllowed(email);
+                return ResponseEntity.status(TOO_EARLY).body(new APIResponse("Password was recently changed. Please wait: "+daysRemaining+" more days before resetting again", null));
+            }
+            passwordResetService.passwordResetRequest(email);
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.VERIFICATION_UPDATE, null));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new APIResponse(e.getMessage(), null));
+        }
+    }
+
+    @PostMapping(UrlMapping.RESET_PASSWORD)
+    public ResponseEntity<APIResponse> passwordReset(@RequestBody PasswordResetRequest passwordResetRequest){
+        try {
+            String token = passwordResetRequest.getToken();
+            String newPassword = passwordResetRequest.getNewPassword();
+
+            if(token == null || token.trim().isEmpty() || newPassword == null || newPassword.trim().isEmpty()){
+                return ResponseEntity.badRequest().body(new APIResponse(FeedBackMessage.MISSING_AUTH, null));
+            }
+
+            String result = passwordResetService.resetPassword(token, newPassword);
+            return ResponseEntity.ok(new APIResponse(result, null));
+        } catch (PasswordChangeNotAllowedException e) {
+            return ResponseEntity.status(TOO_EARLY).body(new APIResponse(e.getMessage(), null));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(new APIResponse(e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new APIResponse(e.getMessage(), null));
+        }
+    }
+
+    @PostMapping(UrlMapping.RESETTING_PASS)
+    public ResponseEntity<APIResponse> passwordResetAdvanced(@RequestBody Map<String, Object> requestBody){
+        try{
+            String token = (String) requestBody.get("token");
+            String newPassword = (String) requestBody.get("newPassword");
+            String confirmNewPassword = (String) requestBody.get("confirmNewPassword");
+
+            if(token == null || token.trim().isEmpty() ||
+                    newPassword == null || newPassword.trim().isEmpty() ||
+                            confirmNewPassword == null || confirmNewPassword.trim().isEmpty()){
+                return ResponseEntity.badRequest().body(new APIResponse("All fields are required", null));
+            }
+
+            ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
+            changePasswordRequest.setNewPassword(newPassword);
+            changePasswordRequest.setConfirmNewPassword(confirmNewPassword);
+
+            String result = passwordResetService.resetPassword(token, changePasswordRequest);
+            return ResponseEntity.ok(new APIResponse(result, null));
+        }catch (PasswordChangeNotAllowedException e){
+            return ResponseEntity.status(TOO_EARLY).body(new APIResponse(e.getMessage(), null));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(new APIResponse(e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new APIResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping(UrlMapping.CAN_RESET_PASS)
+    public ResponseEntity<Map<String, Object>> canResetPassword(@RequestParam String email){
+        try{
+            boolean canReset = verificationTokenService.canUserResetPassword(email);
+            Map<String, Object> response = new HashMap<>();
+            response.put("canReset", canReset);
+
+            if(!canReset){
+                Long daysRemaining = verificationTokenService.getDaysUntilPasswordResetAllowed(email);
+                response.put("daysRemaining", daysRemaining);
+                response.put("message", "Password was recently changed. Please wait "+daysRemaining+" more days before resetting again.");
+            }
+            return ResponseEntity.ok(response);
+        }catch (ResourceNotFoundException e){
+            return ResponseEntity.status(NOT_FOUND).body(Map.of("error", "User not found"));
+        }
+    }
+
+    @GetMapping(UrlMapping.RESET_BY_TOKEN)
+    public ResponseEntity<Map<String, Object>> canResetPasswordByToken(@RequestParam String token){
+        try{
+            PasswordReset passwordReset = passwordResetService.validatePasswordResetToken(token);
+            User user = passwordReset.getUser();
+
+            boolean canReset = user.canChangePassword();
+            Map<String, Object> response = new HashMap<>();
+            response.put("canReset", canReset);
+
+            if(!canReset){
+                Long daysRemaining = user.getDaysUntilPasswordChangeAllowed();
+                response.put("daysRemaining", daysRemaining);
+                response.put("message", "Password was recently changed. Please wait "+daysRemaining+" more days before resetting again.");
+            }
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            return ResponseEntity.status(BAD_REQUEST).body(Map.of("error", "Invalid or expired token"));
+        }
+    }
+
+    @PostMapping(UrlMapping.CHANGE_PASSWORD)
+    public ResponseEntity<APIResponse> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest, Authentication authentication){
+        try{
+            UPCUserDetails userDetails = (UPCUserDetails)authentication.getPrincipal();
+            Long userId = userDetails.getId();
+
+            User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.USER_NOT_FOUND));
+            if(!user.canChangePassword()){
+                long daysRemaining = user.getDaysUntilPasswordChangeAllowed();
+                return ResponseEntity.status(TOO_EARLY).body(new APIResponse("Password was recently changed. Please wait "+daysRemaining+" more days before changing it again", null));
+            }
+            changePasswordService.changePassword(userId, changePasswordRequest);
+            return ResponseEntity.ok(new APIResponse("Password changed successfully", null));
+        }catch (IllegalStateException e){
+            return ResponseEntity.badRequest().body(new APIResponse(e.getMessage(), null));
+        }catch(ResourceNotFoundException e){
+            return ResponseEntity.status(NOT_FOUND).body(new APIResponse("User not found", null));
+        }catch (Exception e){
+            return ResponseEntity.internalServerError().body(new APIResponse("Password change failed", null));
+        }
     }
 }

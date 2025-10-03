@@ -92,6 +92,25 @@ public class VeterinarianService implements IVeterinarianService{
     }
 
     @Override
+    public String addVeterinarianSpecialization(Long veterinarianId, String specialization){
+        if(specialization == null || specialization.trim().isEmpty()){
+            throw new IllegalArgumentException(FeedBackMessage.SPECIALIZATION_REQUIRED);
+        }
+        if(veterinarianId == null){
+            throw  new IllegalArgumentException(FeedBackMessage.VET_ID_REQUIRED);
+        }
+        String normalizedSpecialization = specialization.trim();
+        boolean exists = veterinarianRepository.existsBySpecializationIgnoreCase(normalizedSpecialization);
+        if(exists){
+            return normalizedSpecialization + ":" + FeedBackMessage.SPECIALIZATION_ALREADY_EXISTS;
+        }
+        Veterinarian veterinarian = veterinarianRepository.findById(veterinarianId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.VET_NOT_FOUND + veterinarianId));
+        veterinarian.setSpecialization(normalizedSpecialization);
+        veterinarianRepository.save(veterinarian);
+        return normalizedSpecialization;
+    }
+
+    @Override
     public List<String> getVeterinarianSpecializations(){
         return veterinarianRepository.getDistinctVetSpecialization();
     }

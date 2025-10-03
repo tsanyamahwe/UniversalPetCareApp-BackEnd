@@ -1,5 +1,6 @@
 package com.dailycodework.universalpetcare.service.user;
 
+import com.dailycodework.universalpetcare.dto.PasswordChangeInfoDTO;
 import com.dailycodework.universalpetcare.dto.UserDTO;
 import com.dailycodework.universalpetcare.model.User;
 import com.dailycodework.universalpetcare.request.RegistrationRequest;
@@ -11,6 +12,14 @@ import java.util.Map;
 
 public interface IUserService {
     User register(RegistrationRequest registrationRequest);
+
+    void changeUserPassword(Long userId, String currentPassword, String newPassword, String confirmNewPassword);
+
+    boolean canUserChangePassword(Long userId);
+
+    long getDaysUntilPasswordChangeAllowed(Long userId);
+
+    PasswordChangeInfoDTO getPasswordChangeInfo(Long userId);
 
     User update(Long userId, UserUpdateRequest userUpdateRequest);
 

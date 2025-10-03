@@ -28,6 +28,10 @@ public interface IAppointmentService {
     long countAppointments();
 
     List<Map<String, Object>> getAppointmentStatusSummary();
+
+    List<Long> getAppointmentIds();
+
+    void setAppointmentStatus(Long appointmentId);
 //    Appointment getAppointmentByDate(Date appointmentDate);
 //    Appointment getAppointmentByTime(Time appointmentTime);
 //    Appointment getAppointmentByAllSpecs(Long id, String appointmentNo, Date appointmentDate, Time appointmentTime);
