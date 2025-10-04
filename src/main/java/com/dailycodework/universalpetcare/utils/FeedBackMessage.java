@@ -101,9 +101,9 @@ public class FeedBackMessage {
     public static final String TOKEN_SAVED_SUCCESS = "Token saved successfully";
     public static final String NEW_TOKEN = "New token has been created: ";
     public static final String TOKEN_DELETED = "Token deleted successfully";
-    public static final String INVALID_TOKEN = "Invalid verification token ";
+    public static final String INVALID_TOKEN = "Invalid or expired verification token ";
     public static final String VERIFICATION_NOTICE = "Please enter the email associated with your account";
-    public static final String PASSWORD_RESET = "Your password has been reset";
+    public static final String PASSWORD_RESET = "Your password has been reset successfully";
     public static final String VERIFICATION_UPDATE = "A link was sent to your email, please check to complete your password reset request";
     public static final String MISSING_AUTH = "Missing token or password";
     public static final String PASSWORD_REUSE_FORBIDDEN = "You can not repeat the same old password, choose another one!";
@@ -125,6 +125,17 @@ public class FeedBackMessage {
 
     public static final String NOT_FOUND = "Resource not found";
     public static final String RESOURCE_NOT_FOUND = "This resource is not available";
+    public static final String CHANGED_PASSWORD = "Password was recently changed. Please wait ";
+    public static final String MORE_DAYS = " more days before resetting again";
+    public static final String PASS_RESET_FAILED = "Password reset failed: ";
+    public static final String NEW_PASS_AND_CONFIRM = "New Password and confirmation are required";
+    public static final String CONF_PASS_NO_MATCH = "Password confirmation does not match";
+    public static final String NEW_PASS_DIFFERS = "New password must be different from current password";
+    public static final String PASS_RESET_SUCCESS = "Password reset successful";
+    public static final String TOKEN_NOT_VALIDATED = "Warning: Could not invalidate reset token: ";
+    public static final String TOKEN_EXPIRED = "Token has expired";
+    public static final String REQUIRE_ALL_FIELDS = "All fields are required";
+    public static final String CURRENT_PASS_WRONG = "Current password does not match (it is not correct)";
 
 
 

@@ -19,6 +19,7 @@ public class UserDTO {
     private String userType;
     private boolean isEnabled;
     private String specialization;
+    private String bio;
     private LocalDate createdAt;
     private List<AppointmentDTO> appointments;
     private List<ReviewDTO> reviews;

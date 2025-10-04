@@ -100,7 +100,7 @@ public class AuthController {
             //check if user can reset password before sending email
             if(!verificationTokenService.canUserResetPassword(email)){
                 long daysRemaining = verificationTokenService.getDaysUntilPasswordResetAllowed(email);
-                return ResponseEntity.status(TOO_EARLY).body(new APIResponse("Password was recently changed. Please wait: "+daysRemaining+" more days before resetting again", null));
+                return ResponseEntity.status(TOO_EARLY).body(new APIResponse(FeedBackMessage.CHANGED_PASSWORD+daysRemaining+FeedBackMessage.MORE_DAYS, null));
             }
             passwordResetService.passwordResetRequest(email);
             return ResponseEntity.ok(new APIResponse(FeedBackMessage.VERIFICATION_UPDATE, null));
@@ -142,7 +142,7 @@ public class AuthController {
             if(token == null || token.trim().isEmpty() ||
                     newPassword == null || newPassword.trim().isEmpty() ||
                             confirmNewPassword == null || confirmNewPassword.trim().isEmpty()){
-                return ResponseEntity.badRequest().body(new APIResponse("All fields are required", null));
+                return ResponseEntity.badRequest().body(new APIResponse(FeedBackMessage.REQUIRE_ALL_FIELDS, null));
             }
 
             ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
@@ -170,11 +170,11 @@ public class AuthController {
             if(!canReset){
                 Long daysRemaining = verificationTokenService.getDaysUntilPasswordResetAllowed(email);
                 response.put("daysRemaining", daysRemaining);
-                response.put("message", "Password was recently changed. Please wait "+daysRemaining+" more days before resetting again.");
+                response.put("message", FeedBackMessage.CHANGED_PASSWORD+daysRemaining+FeedBackMessage.MORE_DAYS);
             }
             return ResponseEntity.ok(response);
         }catch (ResourceNotFoundException e){
-            return ResponseEntity.status(NOT_FOUND).body(Map.of("error", "User not found"));
+            return ResponseEntity.status(NOT_FOUND).body(Map.of("error", FeedBackMessage.USER_NOT_FOUND));
         }
     }
 
@@ -191,11 +191,11 @@ public class AuthController {
             if(!canReset){
                 Long daysRemaining = user.getDaysUntilPasswordChangeAllowed();
                 response.put("daysRemaining", daysRemaining);
-                response.put("message", "Password was recently changed. Please wait "+daysRemaining+" more days before resetting again.");
+                response.put("message", FeedBackMessage.CHANGED_PASSWORD+daysRemaining+FeedBackMessage.MORE_DAYS);
             }
             return ResponseEntity.ok(response);
         }catch (Exception e){
-            return ResponseEntity.status(BAD_REQUEST).body(Map.of("error", "Invalid or expired token"));
+            return ResponseEntity.status(BAD_REQUEST).body(Map.of("error", FeedBackMessage.INVALID_TOKEN));
         }
     }
 
@@ -208,16 +208,16 @@ public class AuthController {
             User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.USER_NOT_FOUND));
             if(!user.canChangePassword()){
                 long daysRemaining = user.getDaysUntilPasswordChangeAllowed();
-                return ResponseEntity.status(TOO_EARLY).body(new APIResponse("Password was recently changed. Please wait "+daysRemaining+" more days before changing it again", null));
+                return ResponseEntity.status(TOO_EARLY).body(new APIResponse(FeedBackMessage.CHANGED_PASSWORD+daysRemaining+FeedBackMessage.MORE_DAYS, null));
             }
             changePasswordService.changePassword(userId, changePasswordRequest);
-            return ResponseEntity.ok(new APIResponse("Password changed successfully", null));
+            return ResponseEntity.ok(new APIResponse(FeedBackMessage.PASSWORD_RESET, null));
         }catch (IllegalStateException e){
             return ResponseEntity.badRequest().body(new APIResponse(e.getMessage(), null));
         }catch(ResourceNotFoundException e){
-            return ResponseEntity.status(NOT_FOUND).body(new APIResponse("User not found", null));
+            return ResponseEntity.status(NOT_FOUND).body(new APIResponse(FeedBackMessage.USER_NOT_FOUND, null));
         }catch (Exception e){
-            return ResponseEntity.internalServerError().body(new APIResponse("Password change failed", null));
+            return ResponseEntity.internalServerError().body(new APIResponse(FeedBackMessage.PASS_RESET_FAILED, null));
         }
     }
 }

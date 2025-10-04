@@ -82,7 +82,7 @@ public class PasswordResetService implements IPasswordResetService{
             User user = passwordReset.getUser();
             if(!user.canChangePassword()){
                 long daysRemaining = user.getDaysUntilPasswordChangeAllowed();
-                throw new PasswordChangeNotAllowedException("Password was recently changed. Please wait "+daysRemaining+" more days before resetting again");
+                throw new PasswordChangeNotAllowedException(FeedBackMessage.CHANGED_PASSWORD+daysRemaining+FeedBackMessage.MORE_DAYS);
             }
             String result = this.resetPassword(newPassword, user);
             passwordResetRepository.delete(passwordReset);
@@ -92,7 +92,7 @@ public class PasswordResetService implements IPasswordResetService{
         }catch (IllegalArgumentException e){
             throw new IllegalArgumentException(e.getMessage());
         } catch (Exception e) {
-            throw new IllegalArgumentException("Password reset failed: "+ e.getMessage());
+            throw new IllegalArgumentException(FeedBackMessage.PASS_RESET_FAILED+ e.getMessage());
         }
     }
 
@@ -104,16 +104,16 @@ public class PasswordResetService implements IPasswordResetService{
         try{
             if(!user.canChangePassword()){
                 long daysRemaining = user.getDaysUntilPasswordChangeAllowed();
-                throw new PasswordChangeNotAllowedException("Password was recently changed. Please wait "+daysRemaining+" more days before resetting again");
+                throw new PasswordChangeNotAllowedException(FeedBackMessage.CHANGED_PASSWORD+daysRemaining+FeedBackMessage.MORE_DAYS);
             }
             if(!StringUtils.hasText(changePasswordRequest.getNewPassword()) || !StringUtils.hasText(changePasswordRequest.getConfirmNewPassword())){
-                throw new IllegalArgumentException("New Password and confirmation are required");
+                throw new IllegalArgumentException(FeedBackMessage.NEW_PASS_AND_CONFIRM);
             }
             if(!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmNewPassword())){
-                throw new IllegalArgumentException("Password confirmation does not match");
+                throw new IllegalArgumentException(FeedBackMessage.CONF_PASS_NO_MATCH);
             }
             if(passwordEncoder.matches(changePasswordRequest.getNewPassword(), user.getPassword())){
-                throw  new IllegalArgumentException("New password must be different from current password");
+                throw  new IllegalArgumentException(FeedBackMessage.NEW_PASS_DIFFERS);
             }
             if(isValidPassword(changePasswordRequest.getNewPassword())){
                 throw new IllegalArgumentException(FeedBackMessage.INVALID_PASSWORD_FORMAT);
@@ -123,13 +123,13 @@ public class PasswordResetService implements IPasswordResetService{
             userRepository.save(user);
             passwordResetRepository.delete(passwordReset);
             invalidatePasswordResetToken(user);
-            return "Password reset successful";
+            return FeedBackMessage.PASS_RESET_SUCCESS;
         }catch (PasswordChangeNotAllowedException e){
             throw new PasswordChangeNotAllowedException(e.getMessage());
         }catch (IllegalArgumentException e){
             throw new IllegalArgumentException(e.getMessage());
         } catch (Exception e) {
-            throw new IllegalArgumentException("Password reset failed: " +e.getMessage());
+            throw new IllegalArgumentException(FeedBackMessage.PASS_RESET_FAILED +e.getMessage());
         }
     }
 
@@ -144,7 +144,7 @@ public class PasswordResetService implements IPasswordResetService{
             Optional<VerificationToken> tokenOpt = verificationTokenRepository.findByUser(user);
             tokenOpt.ifPresent(verificationTokenRepository::delete);
         } catch (Exception e) {
-            System.err.println("Warning: Could not invalidate reset token: " + e.getMessage());
+            System.err.println(FeedBackMessage.TOKEN_NOT_VALIDATED + e.getMessage());
         }
     }
 
@@ -152,10 +152,10 @@ public class PasswordResetService implements IPasswordResetService{
     public PasswordReset validatePasswordResetToken(String token){
         PasswordReset passwordReset = passwordResetRepository.findByToken(token);
         if(passwordReset == null){
-            throw new IllegalArgumentException("Invalid token");
+            throw new IllegalArgumentException(FeedBackMessage.INVALID_TOKEN);
         }
         if(passwordReset.getExpirationTime().before(new Date())){
-            throw new IllegalArgumentException("Token has expired");
+            throw new IllegalArgumentException(FeedBackMessage.TOKEN_EXPIRED);
         }
         return passwordReset;
     }

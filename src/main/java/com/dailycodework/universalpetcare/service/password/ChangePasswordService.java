@@ -24,25 +24,25 @@ public class ChangePasswordService implements IChangePasswordService{
 
         if(!user.canChangePassword()){
             long daysRemaining = user.getDaysUntilPasswordChangeAllowed();
-            throw new IllegalArgumentException("Password change is restricted. You must wait "+daysRemaining+" more days.");
+            throw new IllegalArgumentException(FeedBackMessage.CHANGED_PASSWORD+daysRemaining+FeedBackMessage.MORE_DAYS);
         }
         // Better validation for empty/null fields
         if (!StringUtils.hasText(changePasswordRequest.getCurrentPassword()) ||
                 !StringUtils.hasText(changePasswordRequest.getNewPassword()) ||
                 !StringUtils.hasText(changePasswordRequest.getConfirmNewPassword())) {
-            throw new IllegalArgumentException("All fields are required");
+            throw new IllegalArgumentException(FeedBackMessage.REQUIRE_ALL_FIELDS);
         }
         // Use passwordEncoder to check if current password matches
         if (!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Current password does not match (it is not correct)");
+            throw new IllegalArgumentException(FeedBackMessage.CURRENT_PASS_WRONG);
         }
         // Check if new password is different from current password
         if (passwordEncoder.matches(changePasswordRequest.getNewPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("New password must be different from current password");
+            throw new IllegalArgumentException(FeedBackMessage.NEW_PASS_DIFFERS);
         }
         // Check if new passwords match
         if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmNewPassword())) {
-            throw new IllegalArgumentException("Password confirmation mis-match");
+            throw new IllegalArgumentException(FeedBackMessage.CONF_PASS_NO_MATCH);
         }
         if(!isValidPassword(changePasswordRequest.getNewPassword())){
             throw new IllegalArgumentException(FeedBackMessage.INVALID_PASSWORD_FORMAT);
